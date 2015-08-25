@@ -21,8 +21,12 @@ for (var i = 0; i < process.argv.length; i++) {
 }
 
 var config = require(configFile);
-config.exercisePath = path.join(__dirname, config.exercisePath);
-config.fontsPath = path.join(__dirname, config.fontsPath);
+if (!path.isAbsolute(config.exercisePath)) {
+  config.exercisePath = path.join(__dirname, config.exercisePath);
+}
+if (!path.isAbsolute(config.fontsPath)) {
+  config.fontsPath = path.join(__dirname, config.fontsPath);
+}
 console.log(config.fontsPath);
 
 var shared = require('./server/socket_shared');
