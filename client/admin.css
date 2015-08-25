@@ -1,0 +1,43 @@
+.admin_panel {
+  width: 200px;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.code_panel {
+  width: calc(100% - 200px);
+  height: 100vh;
+  font-size: 1.3em;
+  position: absolute;
+  left: 200px;
+}
+.result_panel {
+  position: absolute;
+  bottom: 0;
+  left: 200px;
+  width: calc(100% - 200px);
+  height: 2em;
+  background: #3E4037;
+  z-index: 5;
+  transition: height 500ms;
+}
+.user {
+  cursor: pointer;
+}
+.user.selected {
+  font-style: italic;
+}
+.user.inactive {
+  text-decoration: line-through;
+}
+
+.user.poor {
+  color: #F92672;
+}
+.user.good {
+  color: #C2B12C;
+}
+.user.great {
+  color: #49C239;
+}

@@ -1,0 +1,14 @@
+{{#yield-styles}}
+<link rel="stylesheet" href="/editor.css">
+{{/yield-styles}}
+
+{{#yield-content}}
+<div class="panel code_panel">
+  <textarea id="code_panel"></textarea>
+</div>
+<div class="panel result_panel" tabindex="-1"></div>
+{{/yield-content}}
+
+{{#yield-scripts}}
+  <script src="/editor.js"></script>
+{{/yield-scripts}}

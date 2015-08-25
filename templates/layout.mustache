@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+  <title>JS Workshop</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div id="pagestyles">
+    {{{yield-styles}}}
+  </div>
+
+  <div id="app">
+    {{{yield-content}}}
+  </div>
+
+  <script src="socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+  <script src="templates.js"></script>
+  <script>var socket = io();</script>
+  {{{yield-scripts}}}
+</body>
+</html>

@@ -1,0 +1,38 @@
+img, span {
+  position: absolute;
+  border: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+img {
+  width:60vw;
+  max-height: 90vh;
+  display: block;
+  opacity: 0.2;
+}
+span {
+  font-size: 5em;
+  background-color: rgba(255,255,255,0.2);
+  width: 90vw;
+  text-align: left;
+  color: #a6e22e;
+  z-index: 2;
+  padding: 10px 2vw;
+  box-sizing: border-box;
+}
+.placeholder {
+  font-size: 4em;
+}
+span:empty + .placeholder {
+  display: inline-block;
+}
+.placeholder {
+  text-align: center;
+  display: none;
+  z-index: 1;
+  background: transparent;
+}
+span:focus {
+  outline: none;
+}

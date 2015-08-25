@@ -1,0 +1,21 @@
+{{#yield-styles}}
+  <link rel="stylesheet" href="/editor.css">
+  <link rel="stylesheet" href="/admin.css">
+{{/yield-styles}}
+
+{{#yield-content}}
+  <div class="panel admin_panel">
+    <div class="js-user-list">
+      {{> admin_user_list }}
+    </div>
+  </div>
+
+  <div class="panel code_panel">
+    <textarea id="code_panel"></textarea>
+  </div>
+  <div class="panel result_panel" tabindex="-1"></div>
+{{/yield-content}}
+
+{{#yield-scripts}}
+  <script src="/admin.js"></script>
+{{/yield-scripts}}
