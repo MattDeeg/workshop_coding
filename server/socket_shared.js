@@ -17,9 +17,8 @@ function getFunctionContents(fn) {
   return fnLines.join('\n');
 }
 
-var exerciseFolder = './exercises/';
 function loadExercise(name) {
-  var exercisePath = path.resolve(exerciseFolder + name + '.js');
+  var exercisePath = path.resolve(data.exercisePath + name + '.js');
   if (fs.existsSync(exercisePath)) {
     var workshop = require(exercisePath);
     return {
@@ -93,5 +92,6 @@ var data = module.exports = {
   },
   getUserIndex: getUserIndex,
   getCurrentData: getCurrentData,
+  exercisePath: './exercises/',
   loadExercise: loadExercise
 };

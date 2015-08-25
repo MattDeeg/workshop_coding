@@ -4,7 +4,25 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var cookieParser = require('cookie-parser');
 var fs = require('fs');
+var path = require('path');
 var _ = require('underscore');
+
+var configFile = './config';
+var argRegex = /^([^=]+)(="?(.*)"?)?$/;
+for (var i = 0; i < process.argv.length; i++) {
+  var arg = process.argv[i].match(argRegex);
+  if (arg) {
+    var name = arg[1];
+    var value = arg[3];
+    if (name === '--config') {
+      configFile = value;
+    }
+  }
+}
+
+var config = require(configFile);
+config.exercisePath = path.join(__dirname, config.exercisePath);
+config.fontsPath = path.join(__dirname, config.fontsPath);
 
 var shared = require('./server/socket_shared');
 var adminSocket = require('./server/admin_socket');
@@ -30,7 +48,6 @@ fs.readdir(__dirname + '/templates', function(err, files) {
 app.set('partials', partials);
 
 app.use('/img', express.static(__dirname + '/img'));
-app.use('/fonts', express.static(__dirname + '/fonts'));
 app.use(cookieParser());
 
 function render(req, res, template, data) {
@@ -46,7 +63,6 @@ app.get('/', function(req, res){
   if (!req.cookies.name) {
     render(req, res, 'login', {});
   } else {
-    console.log('cookie', req.cookies);
     render(req, res, 'editor', {
       username: req.cookies.name,
       exercise: shared.getCurrentData(req.cookies.workshop_id)
@@ -56,7 +72,11 @@ app.get('/', function(req, res){
 
 var exerciseMap = {};
 var exercises = [];
-fs.readdir(__dirname + '/exercises', function (err, files) {
+shared.exercisePath = config.exercisePath;
+fs.readdir(config.exercisePath, function (err, files) {
+  if (err) {
+    throw err;
+  }
   for (var i = 0; i < files.length; i++) {
     var name = files[i].replace(/\.js$/, '');
     var data = shared.loadExercise(name);
@@ -96,87 +116,15 @@ io.on('connection', function(socket) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-function fileConcat(fileList, mimeType) {
-  var numFiles = fileList.length;
-  return function(req, res) {
-    var output = new Array(numFiles);
-    for (var i = 0; i < numFiles; i++) {
-      if (typeof fileList[i] === 'string') {
-        output[i] = fs.readFileSync(__dirname + fileList[i]);
-      } else if (typeof fileList[i] === 'function') {
-        output[i] = fileList[i]();
-      }
-    }
-    res.setHeader('Content-Type', mimeType);
-    res.writeHead(200);
-    res.end(output.join('\n'));
-  };
-}
-
-var appJS = [
-  '/client/util.js',
-  '/node_modules/hogan-express/node_modules/hogan.js/dist/template-3.0.2.min.js',
-  '/client/spa.js'
-];
-app.get('/app.js', fileConcat(appJS, 'text/javascript'));
-
-var appCSS = [
-  '/fonts/sourcecodepro/stylesheet.css',
-  '/fonts/ubuntumono/stylesheet.css',
-  '/client/app.css'
-];
-app.get('/app.css', fileConcat(appCSS, 'text/css'));
-
-var adminJS = [
-  '/node_modules/codemirror/lib/codemirror.js',
-  '/node_modules/codemirror/mode/javascript/javascript.js',
-  '/client/jshint.config.js',
-  '/node_modules/jshint/dist/jshint.js',
-  function() { return 'var ADMIN_SECRET="' + ADMIN_SECRET + '";'; },
-  '/client/admin.js'
-];
-app.get('/admin.js', fileConcat(adminJS, 'text/javascript'));
-
-var adminCSS = [
-  '/client/admin.css'
-];
-app.get('/admin.css', fileConcat(adminCSS, 'text/css'));
-
-var editorJS = [
-  '/node_modules/codemirror/lib/codemirror.js',
-  '/node_modules/codemirror/mode/javascript/javascript.js',
-  '/client/jshint.config.js',
-  '/node_modules/jshint/dist/jshint.js',
-  '/client/editor.js'
-];
-app.get('/editor.js', fileConcat(editorJS, 'text/javascript'));
-
-var editorCSS = [
-  '/node_modules/codemirror/lib/codemirror.css',
-  '/node_modules/codemirror/theme/monokai.css',
-  '/client/editor.css'
-];
-app.get('/editor.css', fileConcat(editorCSS, 'text/css'));
-
-var loginJS = [
-  '/client/login.js'
-];
-app.get('/login.js', fileConcat(loginJS, 'text/javascript'));
-
-var loginCSS = [
-  '/client/login.css'
-];
-app.get('/login.css', fileConcat(loginCSS, 'text/css'));
-
-////////////////////////////////////////////////////////////////////////////////
-
 var isFontRegex = /\.(eot|svg|ttf|woff|woff2)$/;
+var isCSSRegex = /\.css$/;
 function bindFile(url, file) {
   app.get(url, function(req, res) {
     res.sendFile(file);
   });
 }
 
+var fontStylesheets = [];
 function loadFonts(basePath) {
   var folderContents = fs.readdirSync(basePath);
   for (var i = 0; i < folderContents.length; i++) {
@@ -189,13 +137,98 @@ function loadFonts(basePath) {
     if (!fs.existsSync(filePath)) {
       continue;
     }
-    if (isFontRegex.test(filePath)) {
+    if (isCSSRegex.test(filePath)) {
+      fontStylesheets.push(filePath);
+    } else if (isFontRegex.test(filePath)) {
       bindFile('/' + fileName, filePath);
     }
   }
 }
 
-loadFonts(__dirname + '/fonts');
+/**
+ * Loads any CSS files found in the font directory and makes any font files at the top level of the server
+ */
+fs.exists(config.fontsPath, function(exists) {
+  if (exists) {
+    loadFonts(config.fontsPath);
+  }
+});
+
+////////////////////////////////////////////////////////////////////////////////
+
+function fileConcat(fileList, mimeType) {
+  var numFiles = fileList.length;
+  return function(req, res) {
+    var output = new Array(numFiles);
+    for (var i = 0; i < numFiles; i++) {
+      if (typeof fileList[i] === 'string') {
+        if (path.isAbsolute(fileList[i])) {
+          output[i] = fs.readFileSync(fileList[i]);
+        } else {
+          output[i] = fs.readFileSync(path.join(__dirname, fileList[i]));
+        }
+      } else if (typeof fileList[i] === 'function') {
+        output[i] = fileList[i]();
+      }
+    }
+    res.setHeader('Content-Type', mimeType);
+    res.writeHead(200);
+    res.end(output.join('\n'));
+  };
+}
+
+var appJS = [
+  './client/util.js',
+  './node_modules/hogan-express/node_modules/hogan.js/dist/template-3.0.2.min.js',
+  './client/spa.js'
+];
+app.get('/app.js', fileConcat(appJS, 'text/javascript'));
+
+var appCSS = fontStylesheets.concat([
+  './client/app.css'
+]);
+app.get('/app.css', fileConcat(appCSS, 'text/css'));
+
+var adminJS = [
+  './node_modules/codemirror/lib/codemirror.js',
+  './node_modules/codemirror/mode/javascript/javascript.js',
+  './client/jshint.config.js',
+  './node_modules/jshint/dist/jshint.js',
+  function() { return 'var ADMIN_SECRET="' + ADMIN_SECRET + '";'; },
+  './client/admin.js'
+];
+app.get('/admin.js', fileConcat(adminJS, 'text/javascript'));
+
+var adminCSS = [
+  './client/admin.css'
+];
+app.get('/admin.css', fileConcat(adminCSS, 'text/css'));
+
+var editorJS = [
+  './node_modules/codemirror/lib/codemirror.js',
+  './node_modules/codemirror/mode/javascript/javascript.js',
+  './client/jshint.config.js',
+  './node_modules/jshint/dist/jshint.js',
+  './client/editor.js'
+];
+app.get('/editor.js', fileConcat(editorJS, 'text/javascript'));
+
+var editorCSS = [
+  './node_modules/codemirror/lib/codemirror.css',
+  './node_modules/codemirror/theme/monokai.css',
+  './client/editor.css'
+];
+app.get('/editor.css', fileConcat(editorCSS, 'text/css'));
+
+var loginJS = [
+  './client/login.js'
+];
+app.get('/login.js', fileConcat(loginJS, 'text/javascript'));
+
+var loginCSS = [
+  './client/login.css'
+];
+app.get('/login.css', fileConcat(loginCSS, 'text/css'));
 
 ////////////////////////////////////////////////////////////////////////////////
 
