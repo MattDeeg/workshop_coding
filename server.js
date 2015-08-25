@@ -64,6 +64,10 @@ fs.readdir(__dirname + '/exercises', function (err, files) {
     exercises.push(data);
     exerciseMap[name] = data;
   }
+  if (exercises.length === 0) {
+    throw 'No exercises found';
+  }
+  shared.currentExercise = exercises[0];
 });
 
 var ADMIN_SECRET = 'JsWorkshopAdmin';

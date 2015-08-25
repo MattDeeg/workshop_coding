@@ -57,7 +57,7 @@ function getCurrentData(socketID) {
 var data = module.exports = {
   users: [],
   admin_users: [],
-  currentExercise: loadExercise('workshop1'),
+  currentExercise: null,
   navigate: function navigate(socket, template, data) {
     socket.emit('navigate', {
       template:template,
