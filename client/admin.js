@@ -96,6 +96,9 @@ function updateCodeEditor(data) {
     if (data.users[i].id === selectedUserId) {
       var user = data.users[i];
       editor.setValue(user.data.code || '');
+      if (user.data.cursor) {
+        editor.setCursor(user.data.cursor);
+      }
       if (user.data.tests) {
         tests.setValue(data.currentExercise.tests);
         document.find('.results').innerHTML = user.data.tests.output;

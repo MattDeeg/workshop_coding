@@ -24,7 +24,8 @@ module.exports = function(socket, existing) {
       socket: socket,
       inactive: false,
       data: {
-        code: ''
+        code: shared.currentExercise.code,
+        cursor: null
       }
     };
     shared.users.push(userData);
@@ -52,10 +53,11 @@ module.exports = function(socket, existing) {
     shared.updateAdmin('userlist');
   });
 
-  socket.on('updateCode', function(code) {
+  socket.on('updateCode', function(code, cursor) {
     var index = getUserIndex(socket.id);
     var userData = shared.users[index];
     userData.data.code = code;
+    userData.data.cursor = cursor;
     shared.updateAdmin('code', {forId: socket.id});
     userData.runTests();
   });

@@ -14,7 +14,7 @@ document.on('keydown', function(e) {
   // Disable save key command to avoid natural instincts
   if (e.which === 83 && (e.ctrlKey || e.metaKey) || event.which == 19) {
     e.preventDefault();
-    socket.emit('updateCode', editor.getValue());
+    socket.emit('updateCode', editor.getValue(), editor.getCursor());
   }
 });
 
@@ -29,7 +29,7 @@ socket.on('updatetests', function(results) {
 
 function init() {
   if (editor && tests) {
-    socket.emit('updateCode', editor.getValue());
+    socket.emit('updateCode', editor.getValue(), editor.getCursor());
     return;
   }
   var codePanel = document.getElementById('code_panel');
@@ -55,9 +55,9 @@ function init() {
     editor.on('change', function() {
       clearTimeout(waiting);
       waiting = setTimeout(updateHints, 500);
-      socket.emit('updateCode', editor.getValue());
+      socket.emit('updateCode', editor.getValue(), editor.getCursor());
     });
-    socket.emit('updateCode', editor.getValue());
+    socket.emit('updateCode', editor.getValue(), editor.getCursor());
 
     setTimeout(updateHints, 100);
   }
