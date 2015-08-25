@@ -1,19 +1,17 @@
 var socket = io();
 socket.on('navigate', init);
 var editor, tests;
-var initData = null;
 socket.on('load', function(data) {
   if (data && data.code) {
-    if (editor) {
+    if (editor && tests) {
       editor.setValue(data.code);
-    } else {
-      initData = data.code;
+      tests.setValue(data.tests);
     }
   }
 });
 
 document.on('keydown', function(e) {
-  // Disable save key comman
+  // Disable save key command to avoid natural instincts
   if (e.which === 83 && (e.ctrlKey || e.metaKey) || event.which == 19) {
     e.preventDefault();
     socket.emit('updateCode', editor.getValue());
@@ -26,13 +24,7 @@ document.delegate('click', '.js-toggle-results', function() {
 
 socket.on('updatetests', function(results) {
   document.find('.results').innerHTML = results.output;
-  var progressBar = document.find('.test_progress');
-  var barHtml = '';
-  for (var i = 0; i < results.progressMap.length; i++) {
-    var className = results.progressMap[i] ? 'pass' : 'fail';
-    barHtml += '<span class="bar ' + className + '"></span>';
-  }
-  progressBar.innerHTML = barHtml;
+  document.find('.test_progress').innerHTML = results.barHtml;
 });
 
 function init() {

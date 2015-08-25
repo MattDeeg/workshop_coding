@@ -6,6 +6,10 @@ var cookieParser = require('cookie-parser');
 var fs = require('fs');
 var _ = require('underscore');
 
+var shared = require('./server/socket_shared');
+var adminSocket = require('./server/admin_socket');
+var userSocket = require('./server/user_socket');
+
 app.set('view engine', 'mustache');
 app.set('layout', __dirname + '/templates/layout');
 app.set('views', __dirname + '/templates');
@@ -45,33 +49,39 @@ app.get('/', function(req, res){
     console.log('cookie', req.cookies);
     render(req, res, 'editor', {
       username: req.cookies.name,
-      exercise: socketData.getCurrentData(req.cookies.workshop_id)
+      exercise: shared.getCurrentData(req.cookies.workshop_id)
     });
+  }
+});
+
+var exerciseMap = {};
+var exercises = [];
+fs.readdir(__dirname + '/exercises', function (err, files) {
+  for (var i = 0; i < files.length; i++) {
+    var name = files[i].replace(/\.js$/, '');
+    var data = shared.loadExercise(name);
+    data.name = name;
+    exercises.push(data);
+    exerciseMap[name] = data;
   }
 });
 
 var ADMIN_SECRET = 'JsWorkshopAdmin';
 app.get('/admin', function(req, res) {
-  var data = {
-    users: socketData.getUsers()
-  };
-  render(req, res, 'admin', data);
+  render(req, res, 'admin', {
+    users: shared.getUsers(),
+    exercises: exercises,
+    exercisesJS: JSON.stringify(exerciseMap)
+  });
 });
 
-var socketData = require('./server/socket_shared');
-var adminSocket = require('./server/admin_socket');
-var userSocket = require('./server/user_socket');
 io.on('connection', function(socket) {
   // Client will send a handshake when it's ready to connect
   socket.on('handshake', function() {
     socket.on('identify', function(existingData, adminSecret) {
-      console.log('Identifying: ', existingData, adminSecret);
-      console.log(_.pluck(socketData.users, 'id'));
       if (adminSecret === ADMIN_SECRET) {
-        console.log('admin identify');
         adminSocket(socket);
       } else {
-        console.log('user identify');
         userSocket(socket, existingData);
       }
     });

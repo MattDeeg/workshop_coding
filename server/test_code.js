@@ -7,7 +7,7 @@ chai.should();
 module.exports = function(code, tests, callback) {
   var reporter = new WorkshopReporter({
     onComplete: function() {
-      var progressMap = [];
+      var barHtml = '';
       var output = reporter.console_;
       if (output.length) {
         output += '<hr>';
@@ -17,7 +17,10 @@ module.exports = function(code, tests, callback) {
       _.each(reporter.specMap_, function(spec) {
         var numErrors = spec.errors.length;
         numTests += 1;
-        progressMap.push(numErrors === 0);
+
+        var className = numErrors === 0 ? 'pass' : 'fail';
+        barHtml += '<span class="bar ' + className + '"></span>';
+
         if (numErrors > 0) {
           output += '<div class="failing">' + spec.name + '</div>';
           for (var i = 0; i < numErrors; i++) {
@@ -40,7 +43,7 @@ module.exports = function(code, tests, callback) {
       callback({
         testsStr: numTestsPassing + '/' + numTests,
         testClass: testClass,
-        progressMap: progressMap,
+        barHtml: barHtml,
         output: output
       });
     }

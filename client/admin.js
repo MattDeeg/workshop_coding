@@ -1,5 +1,5 @@
 var socket = io();
-var editor;
+var editor, preview, tests;
 socket.on('init_user', function() {
   window.location = '/';
 });
@@ -19,9 +19,57 @@ function init() {
       gutters: ['hint-gutter'],
       theme: 'monokai'
     });
+
+    tests = CodeMirror.fromTextArea(document.getElementById('result_panel'), {
+      readOnly: true,
+      mode: 'javascript',
+      theme: 'monokai'
+    });
+
+    preview = CodeMirror.fromTextArea(document.getElementById('preview_panel'), {
+      readOnly: true,
+      mode: 'javascript',
+      lineNumbers: false,
+      theme: 'monokai'
+    });
   }
 }
 init();
+
+var exerciseSelector = document.find('.js-exercise-selector');
+document.find('.js-change-exercise').on('click', function() {
+  exerciseSelector.toggleClass('hidden');
+});
+
+exerciseSelector.on('change', function() {
+  var radioButtons = exerciseSelector.elements.exercise;
+  var selected;
+  for (var i = radioButtons.length; i--;) {
+    if (radioButtons[i].checked) {
+      selected = radioButtons[i].value;
+      break;
+    }
+  }
+  if (selected) {
+    preview.setValue(exercises[selected].code);
+  }
+});
+
+exerciseSelector.on('submit', function(e) {
+  e.preventDefault();
+  var radioButtons = exerciseSelector.elements.exercise;
+  var selected;
+  for (var i = radioButtons.length; i--;) {
+    if (radioButtons[i].checked) {
+      selected = radioButtons[i].value;
+      break;
+    }
+  }
+  if (selected) {
+    socket.emit('changeExercise', selected);
+    exerciseSelector.toggleClass('hidden');
+  }
+});
 
 var lastUserData;
 var selectedUserId = null;
@@ -46,7 +94,13 @@ function updateUserList(data) {
 function updateCodeEditor(data) {
   for (var i = data.users.length; i--;) {
     if (data.users[i].id === selectedUserId) {
-      editor.setValue(data.users[i].data.code || '');
+      var user = data.users[i];
+      editor.setValue(user.data.code || '');
+      if (user.data.tests) {
+        tests.setValue(data.currentExercise.tests);
+        document.find('.results').innerHTML = user.data.tests.output;
+        document.find('.test_progress').innerHTML = user.data.tests.barHtml;
+      }
       break;
     }
   }

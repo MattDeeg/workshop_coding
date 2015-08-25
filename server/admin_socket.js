@@ -18,6 +18,8 @@ module.exports = function(socket) {
     }
   }
 
+  socket.on('changeExercise', shared.changeExercise);
+
   socket.on('logout', function() {
     shared.navigate(socket, 'login');
     removeUser();

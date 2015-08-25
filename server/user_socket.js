@@ -36,6 +36,7 @@ module.exports = function(socket, existing) {
       socket.emit('updatetests', result);
       if (!failed) {
         shared.updateAdmin('userlist');
+        shared.updateAdmin('code', {forId: socket.id});
       }
     });
   }, 1000);

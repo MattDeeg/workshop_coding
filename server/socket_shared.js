@@ -64,6 +64,14 @@ var data = module.exports = {
       data:data||{}
     });
   },
+  changeExercise: function(name) {
+    data.currentExercise = loadExercise(name);
+    for (var i = data.users.length; i--;) {
+      var user = data.users[i];
+      user.socket.emit('load', data.currentExercise);
+      user.data.code = data.currentExercise.code;
+    }
+  },
   getUsers: function() {
     var numUsers = data.users.length;
     var results = new Array(numUsers);
@@ -78,10 +86,12 @@ var data = module.exports = {
   },
   updateAdmin: function(type, extraData) {
     var socketData = _.extend({ users: data.getUsers() }, extraData);
+    socketData.currentExercise = data.currentExercise;
     for (var i = data.admin_users.length; i--;) {
       data.admin_users[i].socket.emit(type, socketData);
     }
   },
   getUserIndex: getUserIndex,
-  getCurrentData: getCurrentData
+  getCurrentData: getCurrentData,
+  loadExercise: loadExercise
 };

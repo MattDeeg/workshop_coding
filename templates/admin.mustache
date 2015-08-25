@@ -8,14 +8,37 @@
     <div class="js-user-list">
       {{> admin_user_list }}
     </div>
+    <button class="js-change-exercise change_exercise">Change Exercise</button>
   </div>
 
   <div class="panel code_panel">
     <textarea id="code_panel"></textarea>
   </div>
-  <div class="panel result_panel" tabindex="-1"></div>
+  <div class="panel result_panel">
+    <div class="test_progress js-toggle-results"></div>
+    <div class="tests">
+      <textarea id="result_panel">{{{exercise.tests}}}</textarea>
+    </div>
+    <div class="results"></div>
+  </div>
+
+  <form class="exercise_selector js-exercise-selector hidden">
+    <div class="exercise_list">
+      {{#exercises}}
+      <input type="radio" name="exercise" id="exercise_list_{{name}}" value="{{name}}">
+      <label for="exercise_list_{{name}}">{{name}}</label>
+      {{/exercises}}
+    </div>
+    <div class="exercise_preview">
+      <textarea id="preview_panel"></textarea>
+    </div>
+    <input type="submit" value="Change Current Exercise">
+  </form>
 {{/yield-content}}
 
 {{#yield-scripts}}
+  <script>
+  var exercises = {{{exercisesJS}}};
+  </script>
   <script src="/admin.js"></script>
 {{/yield-scripts}}

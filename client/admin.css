@@ -5,23 +5,6 @@
   left: 0;
   top: 0;
 }
-.code_panel {
-  width: calc(100% - 200px);
-  height: 100vh;
-  font-size: 1.3em;
-  position: absolute;
-  left: 200px;
-}
-.result_panel {
-  position: absolute;
-  bottom: 0;
-  left: 200px;
-  width: calc(100% - 200px);
-  height: 2em;
-  background: #3E4037;
-  z-index: 5;
-  transition: height 500ms;
-}
 .user {
   cursor: pointer;
 }
@@ -40,4 +23,142 @@
 }
 .user.great {
   color: #49C239;
+}
+
+.code_panel {
+  width: calc(100% - 200px);
+  left: 200px;
+  height: 60vh;
+  font-size: 1.3em;
+  transition: height 500ms;
+  position: absolute;
+}
+.result_panel {
+  position: absolute;
+  top: 60vh;
+  left: 0;
+  width: calc(100% - 200px);
+  height: 40vh;
+  left: 200px;
+  padding-top: 2em;
+  background: #3E4037;
+  z-index: 10;
+  transition: top 500ms;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.result_panel .CodeMirror {
+  background: transparent;
+  overflow-y: auto;
+}
+
+.result_panel .test_progress {
+  position: absolute;
+  top: 0.5em;
+  left: 10px;
+  width: calc(100% - 20px);
+  height: 1em;
+  display: table;
+  border-spacing: 5px 0;
+}
+.result_panel .test_progress .bar {
+  display: table-cell;
+}
+.result_panel .test_progress .pass {
+  background-color: #A6E22E;
+}
+.result_panel .test_progress .fail {
+  background-color: #F9263C;
+}
+
+.result_panel .tests,
+.result_panel .results {
+  width: 45%;
+  margin-left: 5%;
+  float: left;
+  height: 100%;
+  overflow: auto;
+}
+.result_panel .pb {
+  width: 10px;
+  padding-bottom: 50px;
+}
+
+.result_panel .results .passing {
+  color: #A6E22E;
+}
+.result_panel .results .failing, .result_panel .results .failing-error {
+  color: #F9263C;
+}
+
+.result_panel .failing-error {
+  margin-left: 20px;
+}
+
+#preview_panel {
+  width: 100%;
+  height: 400px;
+}
+.exercise_preview .CodeMirror {
+  height: 50vh;
+}
+.exercise_selector {
+  background: #3E4037;
+  position: absolute;
+  top: 10vh;
+  left: 10vw;
+  width: 80vw;
+  height: 80vh;
+  z-index: 10;
+  border: 1px solid #fff;
+  box-sizing: border-box;
+  padding: 5vmin;
+}
+.hidden {
+  left: -10000px;
+}
+
+button,
+input[type=button],
+input[type=submit] {
+  border: none;
+  background-color: #5F6158;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1em;
+}
+button:active,
+input[type=button]:active,
+input[type=submit]:active {
+  background-color: #4D4F49;
+}
+button:focus,
+input[type=button]:focus,
+input[type=submit]:focus {
+  outline: none;
+}
+
+.exercise_list {
+  margin-bottom: 10px;
+  background-color: #272822;
+  max-height: 15vh;
+  overflow: auto;
+}
+.exercise_list input {
+  display: none;
+}
+.exercise_list label {
+  display: block;
+  padding: 10px;
+}
+.exercise_list input:checked + label {
+  background-color: #5F6158;
+}
+.exercise_list label:active {
+  background-color: #32332F;
+}
+.change_exercise {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
