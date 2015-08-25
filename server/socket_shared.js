@@ -18,7 +18,7 @@ function getFunctionContents(fn) {
 }
 
 function loadExercise(name) {
-  var exercisePath = path.resolve(data.exercisePath + name + '.js');
+  var exercisePath = path.resolve(data.exercisePath + '/' + name + '.js');
   if (fs.existsSync(exercisePath)) {
     var workshop = require(exercisePath);
     return {
