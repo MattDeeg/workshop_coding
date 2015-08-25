@@ -71,11 +71,7 @@ function init() {
     setTimeout(updateHints, 100);
   }
 }
-window.on('load', init);
-socket.on('init_user', init);
-socket.on('navigate', function () {
-  setTimeout(init, 100);
-});
+window.registerPostNavigate(init);
 
 function setTheme(newTheme) {
   var codemirror = document.querySelector('.CodeMirror');

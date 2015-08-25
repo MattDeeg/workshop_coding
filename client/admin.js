@@ -4,8 +4,6 @@ socket.on('init_user', function() {
   window.location = '/';
 });
 
-socket.on('navigate', init);
-
 function init() {
   var panel = document.getElementById('code_panel');
   if (panel) {
@@ -34,7 +32,7 @@ function init() {
     });
   }
 }
-init();
+window.registerPostNavigate(init);
 
 var exerciseSelector = document.find('.js-exercise-selector');
 document.find('.js-change-exercise').on('click', function() {

@@ -27,8 +27,11 @@ document.delegate('click', '.logout', function(e) {
 
 var loadedScripts = {};
 
-function loadScripts(scripts) {
+function loadScripts(scripts, callback) {
   if (scripts.length === 0) {
+    if (callback && typeof callback === 'function') {
+      callback();
+    }
     return;
   }
   var script = scripts.splice(0, 1);
@@ -36,14 +39,15 @@ function loadScripts(scripts) {
   if (script.src) {
     loadedScripts[script.src] = true;
     var stupid = document.createElement('script');
+    stupid.onload = function() {
+      loadScripts(scripts, callback);
+    };
     stupid.setAttribute('src', script.src);
     document.body.appendChild(stupid);
-    stupid.onload = function() {
-      loadScripts(scripts);
-    };
   } else if (script.inline) {
     // Inline scripts apparently can't be injected, so we need to eval it
     eval(script.inline); // jshint ignore:line
+    loadScripts(scripts, callback);
   }
 }
 
@@ -77,31 +81,30 @@ function renderState(state) {
       });
     }
   }
-
-  var styles = docFrag.findAll('link');
-  var style;
-  for (i = 0; i < styles.length; i++) {
-    style = styles[i];
-    style.parentNode.removeChild(style);
-    if (style.href) {
-      if (!loadedScripts[style.href]) {
-        loadedScripts[style.href] = true;
-        var stupid = document.createElement('link');
-        stupid.rel = 'stylesheet';
-        stupid.href = style.href;
-        document.body.appendChild(stupid);
-      }
-    }
-  }
-
   appContainer.append(docFrag);
-  loadScripts(scriptsToLoad);
+  loadScripts(scriptsToLoad, function() {
+    runPostNavigate();
+  });
 }
 socket.on('navigate', renderState);
+
+var postNavigateTasks = [];
+function registerPostNavigate(fn) {
+  if (typeof fn === 'function') {
+    postNavigateTasks.push(fn);
+  }
+}
+
+function runPostNavigate() {
+  for (var i = 0; i < postNavigateTasks.length; i++) {
+    postNavigateTasks[i]();
+  }
+}
 
 window.on('load', function() {
   var scripts = document.findAll('script[src]');
   for (var i = 0; i < scripts.length; i++) {
     loadedScripts[scripts[i].src] = true;
   }
+  runPostNavigate();
 });
