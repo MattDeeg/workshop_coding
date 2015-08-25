@@ -23,6 +23,7 @@ for (var i = 0; i < process.argv.length; i++) {
 var config = require(configFile);
 config.exercisePath = path.join(__dirname, config.exercisePath);
 config.fontsPath = path.join(__dirname, config.fontsPath);
+console.log(config.fontsPath);
 
 var shared = require('./server/socket_shared');
 var adminSocket = require('./server/admin_socket');
@@ -148,11 +149,9 @@ function loadFonts(basePath) {
 /**
  * Loads any CSS files found in the font directory and makes any font files at the top level of the server
  */
-fs.exists(config.fontsPath, function(exists) {
-  if (exists) {
-    loadFonts(config.fontsPath);
-  }
-});
+if (fs.existsSync(config.fontsPath)) {
+  loadFonts(config.fontsPath);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
