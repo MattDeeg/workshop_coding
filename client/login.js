@@ -1,5 +1,5 @@
 var socket = io();
-document.find('#name').on('keydown', function(e) {
+document.delegate('keydown', '#name', function(e) {
   if (e.which === 13) {
     e.preventDefault();
     var username = e.target.textContent;

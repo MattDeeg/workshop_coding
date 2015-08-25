@@ -19,20 +19,29 @@ document.on('keydown', function(e) {
 });
 
 document.delegate('click', '.js-toggle-results', function() {
-  document.body.toggleClass('revealed');
+  if (editor) {
+    document.body.toggleClass('revealed');
+  }
 });
 
 socket.on('updatetests', function(results) {
-  document.find('.results').innerHTML = results.output;
-  document.find('.test_progress').innerHTML = results.barHtml;
+  var resultsDiv = document.find('.results');
+  if (resultsDiv) {
+    resultsDiv.innerHTML = results.output;
+    document.find('.test_progress').innerHTML = results.barHtml;
+  }
 });
 
 function init() {
+  var codePanel = document.getElementById('code_panel');
+  if (!codePanel) {
+    editor = tests = null;
+    return;
+  }
   if (editor && tests) {
     socket.emit('updateCode', editor.getValue(), editor.getCursor());
     return;
   }
-  var codePanel = document.getElementById('code_panel');
   var resultPanel = document.getElementById('result_panel');
   if (codePanel) {
     editor = CodeMirror.fromTextArea(codePanel, {
@@ -64,7 +73,9 @@ function init() {
 }
 window.on('load', init);
 socket.on('init_user', init);
-socket.on('navigate', setTimeout(init, 100));
+socket.on('navigate', function () {
+  setTimeout(init, 100);
+});
 
 function setTheme(newTheme) {
   var codemirror = document.querySelector('.CodeMirror');

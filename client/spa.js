@@ -21,6 +21,7 @@ window.on('load', function() {
 
 document.delegate('click', '.logout', function(e) {
   e.preventDefault();
+  document.cookie='name=';
   socket.emit('logout');
 });
 

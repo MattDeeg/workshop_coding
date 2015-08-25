@@ -55,23 +55,29 @@ module.exports = function(socket, existing) {
 
   socket.on('updateCode', function(code, cursor) {
     var index = getUserIndex(socket.id);
-    var userData = shared.users[index];
-    userData.data.code = code;
-    userData.data.cursor = cursor;
-    shared.updateAdmin('code', {forId: socket.id});
-    userData.runTests();
+    if (index !== null) {
+      var userData = shared.users[index];
+      userData.data.code = code;
+      userData.data.cursor = cursor;
+      shared.updateAdmin('code', {forId: socket.id});
+      userData.runTests();
+    }
   });
 
   socket.on('logout', function() {
     shared.navigate(socket, 'login');
     var index = getUserIndex(socket.id);
-    shared.users.splice(index, 1);
-    shared.updateAdmin('userlist');
+    if (index !== null) {
+      shared.users.splice(index, 1);
+      shared.updateAdmin('userlist');
+    }
   });
 
   socket.on('disconnect', function() {
     var index = getUserIndex(socket.id);
-    shared.users[index].inactive = true;
-    shared.updateAdmin('userlist');
+    if (index !== null) {
+      shared.users[index].inactive = true;
+      shared.updateAdmin('userlist');
+    }
   });
 };
