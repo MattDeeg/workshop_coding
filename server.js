@@ -5,7 +5,10 @@ var io = require('socket.io')(http);
 var cookieParser = require('cookie-parser');
 var fs = require('fs');
 var path = require('path');
+var pathIsAbsolute = require('path-is-absolute');
 var _ = require('underscore');
+
+path.isAbsolute = pathIsAbsolute;
 
 var configFile = './config';
 var argRegex = /^([^=]+)(="?(.*)"?)?$/;
