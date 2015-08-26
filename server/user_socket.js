@@ -31,7 +31,7 @@ module.exports = function(socket, existing) {
     shared.users.push(userData);
   }
 
-  userData.runTests = _.debounce(function() {
+  function runTests() {
     tester(userData.data.code, shared.currentExercise.tests, function(result, failed) {
       userData.data.tests = result;
       socket.emit('updatetests', result);
@@ -40,7 +40,13 @@ module.exports = function(socket, existing) {
         shared.updateAdmin('code', {forId: socket.id});
       }
     });
-  }, 1000);
+  }
+
+  userData.runTests = _.debounce(runTests, 1000);
+
+  if (!userData.data.tests) {
+    runTests();
+  }
 
   shared.updateAdmin('userlist');
 

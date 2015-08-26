@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var tester = require('./test_code');
 
 function getFunctionContents(fn) {
   var fnLines = fn.toString().split('\n');
@@ -65,11 +66,16 @@ var data = module.exports = {
   },
   changeExercise: function(name) {
     data.currentExercise = loadExercise(name);
-    for (var i = data.users.length; i--;) {
-      var user = data.users[i];
-      user.socket.emit('load', data.currentExercise);
-      user.data.code = data.currentExercise.code;
-    }
+    // Get default test results
+    tester(data.currentExercise.code, data.currentExercise.tests, function(result) {
+      for (var i = data.users.length; i--;) {
+        var user = data.users[i];
+        user.socket.emit('load', data.currentExercise);
+        user.data.tests = result;
+        user.data.code = data.currentExercise.code;
+        socket.emit('updatetests', result);
+      }
+    });
   },
   getUsers: function() {
     var numUsers = data.users.length;
