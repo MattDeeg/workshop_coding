@@ -1,8 +1,6 @@
 var _ = require('underscore');
 var Jasmine = require('jasmine');
-var chai = require('chai');
 var WorkshopReporter = require('./workshop_reporter');
-chai.should();
 
 module.exports = function(code, tests, callback) {
   var reporter = new WorkshopReporter();
