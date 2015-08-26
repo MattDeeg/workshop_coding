@@ -206,7 +206,8 @@ var adminJS = [
 app.get('/admin.js', fileConcat(adminJS, 'text/javascript'));
 
 var adminCSS = [
-  './client/admin.css'
+  './client/admin.css',
+  './client/tests.css'
 ];
 app.get('/admin.css', fileConcat(adminCSS, 'text/css'));
 
@@ -222,7 +223,8 @@ app.get('/editor.js', fileConcat(editorJS, 'text/javascript'));
 var editorCSS = [
   './node_modules/codemirror/lib/codemirror.css',
   './node_modules/codemirror/theme/monokai.css',
-  './client/editor.css'
+  './client/editor.css',
+  './client/tests.css'
 ];
 app.get('/editor.css', fileConcat(editorCSS, 'text/css'));
 

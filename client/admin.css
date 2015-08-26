@@ -1,9 +1,13 @@
 .admin_panel {
+  background-color: #3E4037;
   width: 200px;
   height: 100vh;
   position: absolute;
   left: 0;
   top: 0;
+}
+.user_list {
+  padding: 10px;
 }
 .user {
   cursor: pointer;
@@ -34,65 +38,10 @@
   position: absolute;
 }
 .result_panel {
-  position: absolute;
+  left: 200px;
   top: 60vh;
-  left: 0;
   width: calc(100% - 200px);
   height: 40vh;
-  left: 200px;
-  padding-top: 2em;
-  background: #3E4037;
-  z-index: 10;
-  transition: top 500ms;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.result_panel .CodeMirror {
-  background: transparent;
-  overflow-y: auto;
-}
-
-.result_panel .test_progress {
-  position: absolute;
-  top: 0.5em;
-  left: 10px;
-  width: calc(100% - 20px);
-  height: 1em;
-  display: table;
-  border-spacing: 5px 0;
-}
-.result_panel .test_progress .bar {
-  display: table-cell;
-}
-.result_panel .test_progress .pass {
-  background-color: #A6E22E;
-}
-.result_panel .test_progress .fail {
-  background-color: #F9263C;
-}
-
-.result_panel .tests,
-.result_panel .results {
-  width: 45%;
-  margin-left: 5%;
-  float: left;
-  height: 100%;
-  overflow: auto;
-}
-.result_panel .pb {
-  width: 10px;
-  padding-bottom: 50px;
-}
-
-.result_panel .results .passing {
-  color: #A6E22E;
-}
-.result_panel .results .failing, .result_panel .results .failing-error {
-  color: #F9263C;
-}
-
-.result_panel .failing-error {
-  margin-left: 20px;
 }
 
 #preview_panel {
