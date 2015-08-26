@@ -89,6 +89,7 @@ function updateUserList(data) {
   for (var i = data.users.length; i--;) {
     data.users[i].selected = data.users[i].id === selectedUserId;
   }
+  var userList = document.find('.js-user-list');
   userList.empty();
   userList.append(templates('admin_user_list', data, true));
 }
