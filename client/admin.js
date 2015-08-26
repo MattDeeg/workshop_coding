@@ -34,13 +34,17 @@ function init() {
 }
 window.registerPostNavigate(init);
 
-var exerciseSelector = document.find('.js-exercise-selector');
-document.find('.js-change-exercise').on('click', function() {
-  exerciseSelector.toggleClass('hidden');
+document.delegate('click', '.js-change-exercise', function() {
+  document.find('.js-exercise-selector').toggleClass('hidden');
+});
+document.delegate('click', '.js-exercise-selector', function(e) {
+  if (e.target.hasClass('js-exercise-selector')) {
+    e.target.toggleClass('hidden');
+  }
 });
 
-exerciseSelector.on('change', function() {
-  var radioButtons = exerciseSelector.elements.exercise;
+document.delegate('change', '.js-exercise-selector', function(e) {
+  var radioButtons = e.target.form.elements.exercise;
   var selected;
   for (var i = radioButtons.length; i--;) {
     if (radioButtons[i].checked) {
@@ -53,8 +57,9 @@ exerciseSelector.on('change', function() {
   }
 });
 
-exerciseSelector.on('submit', function(e) {
+document.delegate('submit', '.js-exercise-selector-form', function(e) {
   e.preventDefault();
+  var exerciseSelector = e.target.closest('js-exercise-selector-form');
   var radioButtons = exerciseSelector.elements.exercise;
   var selected;
   for (var i = radioButtons.length; i--;) {
@@ -65,14 +70,13 @@ exerciseSelector.on('submit', function(e) {
   }
   if (selected) {
     socket.emit('changeExercise', selected);
-    exerciseSelector.toggleClass('hidden');
+    e.target.closest('js-exercise-selector').toggleClass('hidden');
   }
 });
 
 var lastUserData;
 var selectedUserId = null;
-var userList = document.find('.js-user-list');
-userList.delegate('click', '.js-user', function(e) {
+document.delegate('click', '.js-user', function(e) {
   var userRow  = e.target.closest('js-user');
   selectedUserId = userRow.getAttribute('data-id');
   if (lastUserData) {

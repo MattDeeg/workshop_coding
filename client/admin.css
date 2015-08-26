@@ -52,19 +52,26 @@
   height: 50vh;
 }
 .exercise_selector {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(248, 248, 248, 0.63);
+  z-index: 100;
+}
+.hidden {
+  left: -200vw;
+}
+.exercise_selector_form {
   background: #3E4037;
   position: absolute;
   top: 10vh;
   left: 10vw;
   width: 80vw;
   height: 80vh;
-  z-index: 10;
-  border: 1px solid #fff;
   box-sizing: border-box;
   padding: 5vmin;
-}
-.hidden {
-  left: -10000px;
 }
 
 button,
@@ -85,6 +92,11 @@ button:focus,
 input[type=button]:focus,
 input[type=submit]:focus {
   outline: none;
+}
+
+.exercise_selector_form input[type=submit] {
+  padding: 10px 0;
+  width: 100%;
 }
 
 .exercise_list {
@@ -110,4 +122,5 @@ input[type=submit]:focus {
   position: absolute;
   bottom: 0;
   width: 100%;
+  padding: 15px 0;
 }

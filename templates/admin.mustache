@@ -22,18 +22,20 @@
     <div class="results"></div>
   </div>
 
-  <form class="exercise_selector js-exercise-selector hidden">
-    <div class="exercise_list">
-      {{#exercises}}
-      <input type="radio" name="exercise" id="exercise_list_{{name}}" value="{{name}}">
-      <label for="exercise_list_{{name}}">{{name}}</label>
-      {{/exercises}}
-    </div>
-    <div class="exercise_preview">
-      <textarea id="preview_panel"></textarea>
-    </div>
-    <input type="submit" value="Change Current Exercise">
-  </form>
+  <div class="exercise_selector js-exercise-selector hidden">
+    <form class="js-exercise-selector-form exercise_selector_form">
+      <div class="exercise_list">
+        {{#exercises}}
+        <input type="radio" name="exercise" id="exercise_list_{{name}}" value="{{name}}">
+        <label for="exercise_list_{{name}}">{{name}}</label>
+        {{/exercises}}
+      </div>
+      <div class="exercise_preview">
+        <textarea id="preview_panel"></textarea>
+      </div>
+      <input type="submit" value="Change Current Exercise">
+    </form>
+  </div>
 {{/yield-content}}
 
 {{#yield-scripts}}
