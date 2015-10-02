@@ -242,6 +242,14 @@ app.get('/login.css', fileConcat(loginCSS, 'text/css'));
 
 ////////////////////////////////////////////////////////////////////////////////
 
+app.get('/workshop-output.html', function(req, res) {
+  var data = shared.getCurrentData(req.cookies.workshop_id);
+  res.writeHead(200);
+  res.end('<!DOCTYPE html><html lang="en"><body>' + data.output + '<script>alert("whoooo");</script>');
+});
+
+////////////////////////////////////////////////////////////////////////////////
+
 var Hogan = require('hogan-express/node_modules/hogan.js');
 app.get('/templates.js', function (req, res) {
   var templates = [];

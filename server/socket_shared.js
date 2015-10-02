@@ -22,10 +22,28 @@ function loadExercise(name) {
   var exercisePath = path.resolve(data.exercisePath + '/' + name + '.js');
   if (fs.existsSync(exercisePath)) {
     var workshop = require(exercisePath);
-    return {
-      code: getFunctionContents(workshop.initial),
-      tests: getFunctionContents(workshop.tests)
-    };
+    if (typeof workshop.initial === 'function') {
+      return {
+        code: getFunctionContents(workshop.initial),
+        tests: getFunctionContents(workshop.tests)
+      };
+    } else {
+      var files = [];
+      for (var filename in workshop.initial) {
+        files.push({
+          name: filename,
+          code: getFunctionContents(workshop.initial[filename]),
+          editable: filename !== 'entry.js',
+          fileClass: filename === 'entry.js' ? 'active' : ''
+        });
+      }
+      return {
+        hasFiles: true,
+        files: files,
+        code: getFunctionContents(workshop.initial['entry.js']),
+        output: workshop.output
+      };
+    }
   } else {
     return {};
   }

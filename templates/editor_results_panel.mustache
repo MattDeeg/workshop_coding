@@ -1,0 +1,10 @@
+{{#exercise.tests}}
+<div class="test_progress js-toggle-results"></div>
+<div class="tests">
+  <textarea id="result_panel">{{{exercise.tests}}}</textarea>
+</div>
+<div class="results"></div>
+{{/exercise.tests}}
+{{^exercise.tests}}
+<iframe src="/workshop-output.html"></iframe>
+{{/exercise.tests}}

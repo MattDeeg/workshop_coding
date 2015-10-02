@@ -3,16 +3,15 @@
 {{/yield-styles}}
 
 {{#yield-content}}
-  <div class="header">Welcome {{username}} <a href="#" class="logout">Logout</a></div>
-  <div class="panel code_panel">
-    <textarea id="code_panel">{{{exercise.code}}}</textarea>
-  </div>
-  <div class="panel result_panel">
-    <div class="test_progress js-toggle-results"></div>
-    <div class="tests">
-      <textarea id="result_panel">{{{exercise.tests}}}</textarea>
+  <div class="editor_wrapper{{^exercise.tests}}_horizontal{{/exercise.tests}}">
+    <div class="header">Welcome {{username}} <a href="#" class="logout">Logout</a></div>
+    <div class="panel code_panel">
+      <div class="file_navigator">{{> editor_file_tabs }}</div>
+      <textarea id="code_panel">{{{exercise.code}}}</textarea>
     </div>
-    <div class="results"></div>
+    <div class="panel result_panel">
+      {{> editor_results_panel }}
+    </div>
   </div>
 {{/yield-content}}
 
