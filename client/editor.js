@@ -1,3 +1,5 @@
+var files = window.files;
+var lintEditor = true;
 var socket = io();
 socket.on('navigate', init);
 var editor, tests;
@@ -24,6 +26,31 @@ document.delegate('click', '.js-toggle-results', function() {
   }
 });
 
+document.delegate('click', '.js-file-tab', function(e) {
+  if (e.target.hasClass('active')) {
+    return;
+  }
+  var newFile = e.target.getAttribute('data-file-id');
+  var currentContent = editor.getValue();
+  var newFileData;
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].name === newFile) {
+      newFileData = files[i];
+      files[i].active = true;
+    } else if (files[i].active) {
+      files[i].active = false;
+      files[i].code = currentContent;
+    }
+  }
+
+  editor.setValue(newFileData.code);
+  var isMustache = /\.mustache$/.test(newFileData.name);
+  lintEditor = !isMustache;
+  editor.setOption('mode', isMustache ? 'mustache' : 'javascript');
+  document.findAll('.js-file-tab').removeClass('active');
+  e.target.addClass('active');
+});
+
 socket.on('updatetests', function(results) {
   var resultsDiv = document.find('.results');
   if (resultsDiv) {
@@ -42,7 +69,6 @@ function init() {
     socket.emit('updateCode', editor.getValue(), editor.getCursor());
     return;
   }
-  var resultPanel = document.getElementById('result_panel');
   if (codePanel) {
     editor = CodeMirror.fromTextArea(codePanel, {
       mode: 'javascript',
@@ -51,12 +77,6 @@ function init() {
       electricChars: true,
       lineNumbers: true,
       gutters: ['hint-gutter'],
-      theme: 'monokai'
-    });
-
-    tests = CodeMirror.fromTextArea(resultPanel, {
-      readOnly: true,
-      mode: 'javascript',
       theme: 'monokai'
     });
 
@@ -70,6 +90,15 @@ function init() {
 
     setTimeout(updateHints, 100);
   }
+
+  var resultPanel = document.getElementById('result_panel');
+  if (resultPanel) {
+    tests = CodeMirror.fromTextArea(resultPanel, {
+      readOnly: true,
+      mode: 'javascript',
+      theme: 'monokai'
+    });
+  }
 }
 window.registerPostNavigate(init);
 
@@ -79,6 +108,9 @@ function setTheme(newTheme) {
 }
 
 function updateHints() {
+  if (!lintEditor) {
+    return;
+  }
   editor.operation(function(){
     var value = editor.getValue();
     var numLines = value.split('\n').length;

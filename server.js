@@ -200,6 +200,9 @@ app.get('/app.css', fileConcat(appCSS, 'text/css'));
 var adminJS = [
   './node_modules/codemirror/lib/codemirror.js',
   './node_modules/codemirror/mode/javascript/javascript.js',
+  './node_modules/codemirror/mode/xml/xml.js',
+  './node_modules/codemirror/addon/mode/overlay.js',
+  './client/codemirror-mustache.js',
   './client/jshint.config.js',
   './node_modules/jshint/dist/jshint.js',
   function() { return 'var ADMIN_SECRET="' + ADMIN_SECRET + '";'; },
@@ -216,6 +219,9 @@ app.get('/admin.css', fileConcat(adminCSS, 'text/css'));
 var editorJS = [
   './node_modules/codemirror/lib/codemirror.js',
   './node_modules/codemirror/mode/javascript/javascript.js',
+  './node_modules/codemirror/mode/xml/xml.js',
+  './node_modules/codemirror/addon/mode/overlay.js',
+  './client/codemirror-mustache.js',
   './client/jshint.config.js',
   './node_modules/jshint/dist/jshint.js',
   './client/editor.js'
@@ -242,10 +248,29 @@ app.get('/login.css', fileConcat(loginCSS, 'text/css'));
 
 ////////////////////////////////////////////////////////////////////////////////
 
+var getCompiler = require('./server/compiler');
+var compiler = getCompiler({
+  rootOutputFolder: __dirname + '/tmp/',
+  loaders: []
+});
+
 app.get('/workshop-output.html', function(req, res) {
-  var data = shared.getCurrentData(req.cookies.workshop_id);
-  res.writeHead(200);
-  res.end('<!DOCTYPE html><html lang="en"><body>' + data.output + '<script>alert("whoooo");</script>');
+  var userId = req.cookies.workshop_id;
+  var data = shared.getCurrentData(userId);
+  var fileMap = {};
+  data.files.forEach(function(file) {
+    fileMap[file.name] = file.code;
+  });
+  compiler(fileMap, 'entry.js', userId, function(err, output) {
+    var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
+    if (err) {
+      htmlStr += err;
+    } else {
+      htmlStr += data.output + '<script>' + output + '</script>';
+    }
+    res.writeHead(200);
+    res.end(htmlStr);
+  });
 });
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,8 @@ module.exports = {
       module.exports = function(el) {
         el.innerHTML = 'LOADED';
       };
-    }
+    },
+    'view.mustache': '<div>{{test}}</div>'
   },
   output: '<div id="appwrapper"></div>'
 };

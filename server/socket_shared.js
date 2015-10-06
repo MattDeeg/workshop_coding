@@ -4,6 +4,9 @@ var _ = require('underscore');
 var tester = require('./test_code');
 
 function getFunctionContents(fn) {
+  if (typeof fn !== 'function') {
+    return fn;
+  }
   var fnLines = fn.toString().split('\n');
   // Remove the first and last lines to strip off that function wrapper
   fnLines.splice(0, 1);
@@ -40,6 +43,7 @@ function loadExercise(name) {
       return {
         hasFiles: true,
         files: files,
+        jsFiles: JSON.stringify(files),
         code: getFunctionContents(workshop.initial['entry.js']),
         output: workshop.output
       };
@@ -94,6 +98,12 @@ var data = module.exports = {
         socket.emit('updatetests', result);
       }
     });
+  },
+  getCurrentUser: function(socketID) {
+    var index = getUserIndex(socketID);
+    if (index !== null) {
+      return shared.users[index];
+    }
   },
   getUsers: function() {
     var numUsers = data.users.length;

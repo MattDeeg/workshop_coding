@@ -18,5 +18,6 @@ window.jshintConfig = {
   "trailing": true,
 
   "browser": true,
-  "devel": true
+  "devel": true,
+  "predef": [ "require", "module" ]
 };
