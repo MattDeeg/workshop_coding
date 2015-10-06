@@ -21,31 +21,35 @@ function getFunctionContents(fn) {
   return fnLines.join('\n');
 }
 
+function getFileObject(name, fn, active) {
+  return {
+    name: name,
+    code: getFunctionContents(fn),
+    fileClass: active ? 'active' : ''
+  };
+}
+
 function loadExercise(name) {
   var exercisePath = path.resolve(data.exercisePath + '/' + name + '.js');
   if (fs.existsSync(exercisePath)) {
     var workshop = require(exercisePath);
     if (typeof workshop.initial === 'function') {
+      var files = [getFileObject('', workshop.initial, true)];
       return {
-        code: getFunctionContents(workshop.initial),
-        tests: getFunctionContents(workshop.tests)
+        hasFiles: false,
+        files: files,
+        tests: getFunctionContents(workshop.tests),
+        code: files[0].code
       };
     } else {
-      var files = [];
-      for (var filename in workshop.initial) {
-        files.push({
-          name: filename,
-          code: getFunctionContents(workshop.initial[filename]),
-          editable: filename !== 'entry.js',
-          fileClass: filename === 'entry.js' ? 'active' : ''
-        });
-      }
+      var files = _.map(workshop.initial, function(fn, filename) {
+        return getFileObject(filename, fn, filename === 'entry.js');
+      });
       return {
         hasFiles: true,
         files: files,
         jsFiles: JSON.stringify(files),
-        code: getFunctionContents(workshop.initial['entry.js']),
-        output: workshop.output
+        code: files[0].code
       };
     }
   } else {

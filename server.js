@@ -261,16 +261,18 @@ app.get('/workshop-output.html', function(req, res) {
   data.files.forEach(function(file) {
     fileMap[file.name] = file.code;
   });
-  compiler(fileMap, 'entry.js', userId, function(err, output) {
-    var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
-    if (err) {
-      htmlStr += err;
-    } else {
-      htmlStr += data.output + '<script>' + output + '</script>';
-    }
+  // compiler(fileMap, 'entry.js', userId, function(err, output) {
+  //   var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
+  //   if (err) {
+  //     htmlStr += err;
+  //   } else {
+  //     htmlStr += data.output + '<script>' + output + '</script>';
+  //   }
+  //   res.writeHead(200);
+  //   res.end(htmlStr);
+  // });
     res.writeHead(200);
-    res.end(htmlStr);
-  });
+    res.end('<!DOCTYPE html><html lang="en"><body>OUTPUT GOES HERE?');
 });
 
 ////////////////////////////////////////////////////////////////////////////////
