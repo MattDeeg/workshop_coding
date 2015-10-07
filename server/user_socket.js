@@ -11,7 +11,6 @@ module.exports = function(socket, existing) {
     var index = getUserIndex(existing.id);
     if (index !== null) {
       userData = shared.users[index];
-      userData.id = socket.id;
       userData.socket = socket;
       userData.inactive = false;
     }
@@ -19,7 +18,7 @@ module.exports = function(socket, existing) {
 
   if (!userData) {
     userData = {
-      id: socket.id,
+      id: existing.id,
       name: existing.name,
       socket: socket,
       inactive: false,

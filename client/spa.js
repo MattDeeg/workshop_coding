@@ -1,14 +1,12 @@
 var socket = io();
 window.on('load', function() {
   socket.emit('handshake');
-  socket.on('identify', function(socketID) {
+  socket.on('identify', function() {
     var matches = /(^| )workshop_id="(.*?)"/.exec(document.cookie);
     var existing = {};
     if (matches && matches[2]) {
       existing.id = matches[2];
     }
-    // Set new cookie to latest socket ID
-    document.cookie = 'workshop_id="' + socketID + '"';
 
     matches = /(^| )name="(.*?)"/.exec(document.cookie);
     if (matches && matches[2]) {

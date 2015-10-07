@@ -62,10 +62,10 @@ function loadExercise(name, rootPath) {
   }
 }
 
-function getUserIndex(socketID) {
+function getUserIndex(userId) {
   var index = null;
   for (var i = 0; i < data.users.length; i++) {
-    if (data.users[i].id === socketID) {
+    if (data.users[i].id === userId) {
       index = i;
       break;
     }
@@ -73,8 +73,8 @@ function getUserIndex(socketID) {
   return index;
 }
 
-function getCurrentData(socketID) {
-  var index = getUserIndex(socketID);
+function getCurrentData(userId) {
+  var index = getUserIndex(userId);
   var loadData = _.extend({}, data.currentExercise);
   if (index !== null) {
     loadData.files = data.users[index].data.files;
@@ -116,8 +116,8 @@ var data = module.exports = {
       data.updateAdmin('userlist');
     }
   },
-  getCurrentUser: function(socketID) {
-    var index = getUserIndex(socketID);
+  getCurrentUser: function(userId) {
+    var index = getUserIndex(userId);
     if (index !== null) {
       return shared.users[index];
     }
