@@ -1,5 +1,12 @@
 var files = window.files;
 var activeFile = files[0];
+for (var i = 0; i < files.length; i++) {
+  if (files[i].fileClass === 'active') {
+    activeFile = files[i];
+    break;
+  }
+}
+
 var lintEditor = true;
 var socket = io();
 socket.on('navigate', init);
@@ -18,7 +25,9 @@ socket.on('load', function(data) {
 
 function updateServer() {
   activeFile.code = editor.getValue();
-  socket.emit('updateCode', files, editor.getCursor());
+  var cursor = editor.getCursor();
+  activeFile.cursor = [cursor.line, cursor.ch];
+  socket.emit('updateCode', files);
 }
 
 document.on('keydown', function(e) {
@@ -50,18 +59,17 @@ document.delegate('click', '.js-file-tab', function(e) {
   var newFile = e.target.getAttribute('data-file-id');
   activeFile.code = editor.getValue();
   activeFile.fileClass = '';
-  var isMustache = false;
   for (var i = 0; i < files.length; i++) {
     if (files[i].name === newFile) {
       activeFile = files[i];
       files[i].fileClass = 'active';
       editor.setValue(files[i].code);
-      isMustache = /\.mustache$/.test(files[i].name);
     }
   }
 
-  lintEditor = !isMustache;
-  editor.setOption('mode', isMustache ? 'mustache' : 'javascript');
+  lintEditor = activeFile.lint;
+  editor.setOption('mode', activeFile.mode);
+  editor.setCursor(activeFile.cursor[0], activeFile.cursor[1])
   document.findAll('.js-file-tab').removeClass('active');
   e.target.addClass('active');
 });
@@ -85,10 +93,12 @@ function init() {
     return;
   }
   if (codePanel) {
+    var mode = codePanel.getAttribute('data-cm-mode');
+    lintEditor = codePanel.getAttribute('data-cm-lint');
     editor = CodeMirror.fromTextArea(codePanel, {
-      mode: 'javascript',
+      mode: mode,
       matchBrackets: true,
-      continueComments: "Enter",
+      continueComments: 'Enter',
       electricChars: true,
       lineNumbers: true,
       gutters: ['hint-gutter'],

@@ -7,7 +7,7 @@
     <div class="header">Welcome {{username}} <a href="#" class="logout">Logout</a></div>
     <div class="panel code_panel">
       {{> editor_file_tabs }}
-      <textarea id="code_panel">{{{exercise.code}}}</textarea>
+      <textarea id="code_panel" data-cm-int="{{activeFile.lint}}" data-cm-mode="{{activeFile.mode}}">{{{activeFile.code}}}</textarea>
     </div>
     <div class="panel result_panel" id="result_panel_wrapper">
       {{> editor_results_panel }}

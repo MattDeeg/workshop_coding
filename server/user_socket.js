@@ -64,12 +64,11 @@ module.exports = function(socket, existing) {
     shared.updateAdmin('userlist');
   });
 
-  socket.on('updateCode', function(files, cursor) {
+  socket.on('updateCode', function(files) {
     var index = getUserIndex(socket.id);
     if (index !== null) {
       var userData = shared.users[index];
       userData.data.files = files;
-      userData.data.cursor = cursor;
       shared.updateAdmin('code', {forId: socket.id});
       userData.runTests();
     }

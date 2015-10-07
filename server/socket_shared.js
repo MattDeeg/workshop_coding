@@ -22,10 +22,14 @@ function getFunctionContents(fn) {
 }
 
 function getFileObject(name, fn, active) {
+  var mode = /\.mustache$/.test(name) ? 'mustache' : 'javascript';
   return {
     name: name,
     code: getFunctionContents(fn),
-    fileClass: active ? 'active' : ''
+    fileClass: active ? 'active' : '',
+    mode: mode,
+    lint: mode === 'javascript',
+    cursor: [0, 0]
   };
 }
 
@@ -44,7 +48,7 @@ function loadExercise(name, rootPath) {
     }
     data.files = files;
     data.hasFiles = files.length > 1;
-    data.code = files[0].code;
+    data.code = _.findWhere(files, {name: 'entry.js'}).code;
     data.jsFiles = JSON.stringify(files);
     if (workshop.tests) {
       data.tests = getFunctionContents(workshop.tests);
@@ -73,8 +77,8 @@ function getCurrentData(socketID) {
   var index = getUserIndex(socketID);
   var loadData = _.extend({}, data.currentExercise);
   if (index !== null) {
-    var userData = data.users[index];
-    loadData.files = userData.data.files;
+    loadData.files = data.users[index].data.files;
+    loadData.jsFiles = JSON.stringify(data.users[index].data.files);
   }
   return loadData;
 }

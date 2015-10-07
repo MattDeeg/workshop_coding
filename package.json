@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "supervisor server.js"
+    "dev": "supervisor server.js",
+    "clean": "rm -rf ./tmp"
   },
   "author": "Matt DeGennaro <mattdeeg@gmail.com>",
   "license": "Apache-2.0",

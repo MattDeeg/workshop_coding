@@ -30,8 +30,7 @@ window.registerPostNavigate(init);
 
 function setEditorToFile(file) {
   editor.setValue(file.code || '');
-  var isMustache = /\.mustache$/.test(file.name);
-  editor.setOption('mode', isMustache ? 'mustache' : 'javascript');
+  editor.setOption('mode', file.mode);
 }
 
 var files;

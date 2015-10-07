@@ -73,9 +73,12 @@ app.get('/', function(req, res){
   if (!req.cookies.name) {
     render(req, res, 'login', {});
   } else {
+    var exercise = shared.getCurrentData(req.cookies.workshop_id);
+    var activeFile = _.findWhere(exercise.files, {fileClass: 'active'});
     render(req, res, 'editor', {
       username: req.cookies.name,
-      exercise: shared.getCurrentData(req.cookies.workshop_id)
+      exercise: exercise,
+      activeFile: activeFile
     });
   }
 });
@@ -249,13 +252,13 @@ app.get('/login.css', fileConcat(loginCSS, 'text/css'));
 ////////////////////////////////////////////////////////////////////////////////
 
 var getCompiler = require('./server/compiler');
+var buildRoot = __dirname + '/tmp/';
 var compiler = getCompiler({
-  rootOutputFolder: __dirname + '/tmp/',
+  rootOutputFolder: buildRoot,
   loaders: []
 });
 
-app.get('/admin-workshop-output.html', function(req, res) {
-  var userId = req.cookies.workshop_id;
+function getWorkshopOutput(res, userId) {
   var data = shared.getCurrentData(userId);
   var fileMap = {};
   data.files.forEach(function(file) {
@@ -271,25 +274,16 @@ app.get('/admin-workshop-output.html', function(req, res) {
     res.writeHead(200);
     res.end(htmlStr);
   });
+}
+
+app.get('/admin-workshop-output.html', function(req, res) {
+  console.log('admin-building for ', req.query.user_id);
+  getWorkshopOutput(res, req.query.user_id);
 });
 
 app.get('/workshop-output.html', function(req, res) {
-  var userId = req.cookies.workshop_id;
-  var data = shared.getCurrentData(userId);
-  var fileMap = {};
-  data.files.forEach(function(file) {
-    fileMap[file.name] = file.code;
-  });
-  compiler(fileMap, 'entry.js', userId, function(err, output) {
-    var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
-    if (err) {
-      htmlStr += err;
-    } else {
-      htmlStr += data.output + '<script>' + output + '</script>';
-    }
-    res.writeHead(200);
-    res.end(htmlStr);
-  });
+  console.log('building for ', req.cookies.workshop_id);
+  getWorkshopOutput(res, req.cookies.workshop_id);
 });
 
 ////////////////////////////////////////////////////////////////////////////////

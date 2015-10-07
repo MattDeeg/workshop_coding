@@ -1,10 +1,12 @@
-{{#tests}}
-<div class="test_progress js-toggle-results">{{{barHtml}}}</div>
-<div class="tests">
-  <textarea id="result_panel">{{{tests}}}</textarea>
-</div>
-<div class="results">{{{testOutput}}}</div>
-{{/tests}}
-{{^tests}}
-<iframe src="/admin-workshop-output.html?user_id={{userId}}"></iframe>
-{{/tests}}
+{{#userId}}
+  {{#tests}}
+    <div class="test_progress js-toggle-results">{{{barHtml}}}</div>
+    <div class="tests">
+      <textarea id="result_panel">{{{tests}}}</textarea>
+    </div>
+    <div class="results">{{{testOutput}}}</div>
+  {{/tests}}
+  {{^tests}}
+    <iframe src="/admin-workshop-output.html?user_id={{userId}}"></iframe>
+  {{/tests}}
+{{/userId}}
