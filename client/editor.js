@@ -6,12 +6,11 @@ socket.on('navigate', init);
 var editor, tests;
 socket.on('load', function(data) {
   if (data && data.files) {
-    var editorWrapper = document.getElementById('editor_wrapper');
-    var newContent = templates('editor', {exercise: data});
+    var app = document.getElementById('app');
     files = data.files;
     activeFile = files[0];
-    editorWrapper.before(newContent.content);
-    editorWrapper.remove();
+    app.empty();
+    app.append(templates('editor', {exercise: data}, true));
     editor = tests = null;
     init();
   }
@@ -42,12 +41,12 @@ document.delegate('click', '.js-file-tab', function(e) {
   }
   var newFile = e.target.getAttribute('data-file-id');
   activeFile.code = editor.getValue();
-  activeFile.active = false;
+  activeFile.fileClass = '';
   var isMustache = false;
   for (var i = 0; i < files.length; i++) {
     if (files[i].name === newFile) {
       activeFile = files[i];
-      files[i].active = true;
+      files[i].fileClass = 'active';
       editor.setValue(files[i].code);
       isMustache = /\.mustache$/.test(files[i].name);
     }

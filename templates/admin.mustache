@@ -12,14 +12,11 @@
   </div>
 
   <div class="panel code_panel">
+    <div id="file_tabs">{{> editor_file_tabs }}</div>
     <textarea id="code_panel"></textarea>
   </div>
   <div class="panel result_panel">
-    <div class="test_progress js-toggle-results"></div>
-    <div class="tests">
-      <textarea id="result_panel">{{{exercise.tests}}}</textarea>
-    </div>
-    <div class="results"></div>
+    {{> editor_results_panel }}
   </div>
 
   <div class="exercise_selector js-exercise-selector hidden">

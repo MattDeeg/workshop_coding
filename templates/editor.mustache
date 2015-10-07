@@ -6,16 +6,7 @@
   <div id="editor_wrapper" class="editor_wrapper{{^exercise.tests}}_horizontal{{/exercise.tests}}">
     <div class="header">Welcome {{username}} <a href="#" class="logout">Logout</a></div>
     <div class="panel code_panel">
-      {{#exercise.hasFiles}}
-        <nav class="file_tabs">
-          {{#exercise.files}}
-            <li class="js-file-tab {{fileClass}}" data-file-id="{{name}}">{{name}}</li>
-          {{/exercise.files}}
-        </nav>
-      {{/exercise.hasFiles}}
-      <script>
-      window.files = {{{exercise.jsFiles}}};
-      </script>
+      {{> editor_file_tabs }}
       <textarea id="code_panel">{{{exercise.code}}}</textarea>
     </div>
     <div class="panel result_panel" id="result_panel_wrapper">
@@ -25,5 +16,8 @@
 {{/yield-content}}
 
 {{#yield-scripts}}
+  <script>
+  window.files = {{{exercise.jsFiles}}};
+  </script>
   <script src="/editor.js"></script>
 {{/yield-scripts}}

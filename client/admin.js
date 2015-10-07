@@ -18,11 +18,11 @@ function init() {
       theme: 'monokai'
     });
 
-    tests = CodeMirror.fromTextArea(document.getElementById('result_panel'), {
-      readOnly: true,
-      mode: 'javascript',
-      theme: 'monokai'
-    });
+    // tests = CodeMirror.fromTextArea(document.getElementById('result_panel'), {
+    //   readOnly: true,
+    //   mode: 'javascript',
+    //   theme: 'monokai'
+    // });
 
     preview = CodeMirror.fromTextArea(document.getElementById('preview_panel'), {
       readOnly: true,
@@ -33,6 +33,32 @@ function init() {
   }
 }
 window.registerPostNavigate(init);
+
+function setEditorToFile(file) {
+  editor.setValue(file.code || '');
+  var isMustache = /\.mustache$/.test(file.name);
+  editor.setOption('mode', isMustache ? 'mustache' : 'javascript');
+}
+
+var files;
+document.delegate('click', '.js-file-tab', function(e) {
+  if (!files || e.target.hasClass('active')) {
+    return;
+  }
+  var newFile = e.target.getAttribute('data-file-id');
+  activeFile.fileClass = '';
+  var isMustache = false;
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].name === newFile) {
+      activeFile = files[i];
+      files[i].fileClass = 'active';
+      setEditorToFile(files[i]);
+    }
+  }
+
+  document.findAll('.js-file-tab').removeClass('active');
+  e.target.addClass('active');
+});
 
 document.delegate('click', '.js-change-exercise', function() {
   document.find('.js-exercise-selector').toggleClass('hidden');
@@ -98,11 +124,30 @@ function updateCodeEditor(data) {
   for (var i = data.users.length; i--;) {
     if (data.users[i].id === selectedUserId) {
       var user = data.users[i];
-      editor.setValue(user.data.code || '');
-      if (user.data.cursor) {
-        editor.setCursor(user.data.cursor);
+      if (!files) {
+        files = user.data.files;
+        for (var i = files.length; i--;) {
+          if (files[i].fileClass !== '') {
+            activeFile = files[i];
+            break;
+          }
+        }
+      } else {
+        for (var i = files.length; i--;) {
+          files[i].code = user.data.files[i].code;
+        }
       }
-      if (user.data.tests) {
+
+      var tabs = document.find('#file_tabs');
+      tabs.empty();
+      tabs.append(templates('editor_file_tabs', {
+        exercise: {
+          hasFiles: files.length > 1,
+          files: files
+        }
+      }, true));
+      setEditorToFile(activeFile);
+      if (tests && user.data.tests) {
         tests.setValue(data.currentExercise.tests);
         document.find('.results').innerHTML = user.data.tests.output;
         document.find('.test_progress').innerHTML = user.data.tests.barHtml;

@@ -295,7 +295,8 @@ app.get('/templates.js', function (req, res) {
     output += '}';
     output += 'return function(templateName, data, flat) {';
       output += 'var t=_templates[templateName];';
-      output += 'if (flat) { return renderWith(t, data); }';
+      output += 'if (flat === true) { return renderWith(t, data); }';
+      output += 'else if (flat) { return renderWith(t, data, flat); }';
       output += 'return {';
         output += 'styles:renderWith(t, data, "styles"),';
         output += 'content:renderWith(t, data, "content"),';

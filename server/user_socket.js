@@ -24,6 +24,8 @@ module.exports = function(socket, existing) {
       socket: socket,
       inactive: false,
       data: {
+        hasFiles: shared.currentExercise.hasFiles,
+        files: shared.currentExercise.files,
         code: shared.currentExercise.code,
         cursor: null
       }
@@ -59,11 +61,11 @@ module.exports = function(socket, existing) {
     shared.updateAdmin('userlist');
   });
 
-  socket.on('updateCode', function(code, cursor) {
+  socket.on('updateCode', function(files, cursor) {
     var index = getUserIndex(socket.id);
     if (index !== null) {
       var userData = shared.users[index];
-      userData.data.code = code;
+      userData.data.files = files;
       userData.data.cursor = cursor;
       shared.updateAdmin('code', {forId: socket.id});
       userData.runTests();
