@@ -10,7 +10,7 @@ socket.on('load', function(data) {
     files = data.files;
     activeFile = files[0];
     app.empty();
-    app.append(templates('editor', {exercise: data}, true));
+    app.append(templates('editor', {exercise: data}, 'content'));
     editor = tests = null;
     init();
   }
@@ -26,6 +26,10 @@ document.on('keydown', function(e) {
   if (e.which === 83 && (e.ctrlKey || e.metaKey) || event.which == 19) {
     e.preventDefault();
     updateServer();
+    var resultsIframe = document.find('iframe')
+    if (resultsIframe) {
+      resultsIframe.contentWindow.location.reload();
+    }
   }
 });
 
@@ -33,6 +37,10 @@ document.delegate('click', '.js-toggle-results', function() {
   if (editor) {
     document.body.toggleClass('revealed');
   }
+});
+
+document.delegate('click', '.js-refresh', function(e) {
+  document.find('iframe').contentWindow.location.reload();
 });
 
 document.delegate('click', '.js-file-tab', function(e) {

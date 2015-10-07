@@ -254,6 +254,25 @@ var compiler = getCompiler({
   loaders: []
 });
 
+app.get('/admin-workshop-output.html', function(req, res) {
+  var userId = req.cookies.workshop_id;
+  var data = shared.getCurrentData(userId);
+  var fileMap = {};
+  data.files.forEach(function(file) {
+    fileMap[file.name] = file.code;
+  });
+  compiler(fileMap, 'entry.js', userId, function(err, output) {
+    var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
+    if (err) {
+      htmlStr += err;
+    } else {
+      htmlStr += data.output + '<script>' + output + '</script>';
+    }
+    res.writeHead(200);
+    res.end(htmlStr);
+  });
+});
+
 app.get('/workshop-output.html', function(req, res) {
   var userId = req.cookies.workshop_id;
   var data = shared.getCurrentData(userId);

@@ -45,9 +45,7 @@ function loadExercise(name, rootPath) {
     data.files = files;
     data.hasFiles = files.length > 1;
     data.code = files[0].code;
-    if (data.hasFiles) {
-      data.jsFiles = JSON.stringify(files);
-    }
+    data.jsFiles = JSON.stringify(files);
     if (workshop.tests) {
       data.tests = getFunctionContents(workshop.tests);
     }
@@ -76,9 +74,7 @@ function getCurrentData(socketID) {
   var loadData = _.extend({}, data.currentExercise);
   if (index !== null) {
     var userData = data.users[index];
-    if (userData.data.code !== '') {
-      loadData.code = userData.data.code;
-    }
+    loadData.files = userData.data.files;
   }
   return loadData;
 }
@@ -96,15 +92,25 @@ var data = module.exports = {
   changeExercise: function(name) {
     data.currentExercise = loadExercise(name, data.exercisePath);
     // Get default test results
-    tester(data.currentExercise.code, data.currentExercise.tests, function(result) {
+    if (data.currentExercise.tests) {
+      tester(data.currentExercise.code, data.currentExercise.tests, function(result) {
+        for (var i = data.users.length; i--;) {
+          var user = data.users[i];
+          user.socket.emit('load', data.currentExercise);
+          user.data.tests = result;
+          user.data.files = data.currentExercise.files;
+          user.socket.emit('updatetests', result);
+        }
+      });
+    } else {
       for (var i = data.users.length; i--;) {
         var user = data.users[i];
+        user.data.tests = null;
         user.socket.emit('load', data.currentExercise);
-        user.data.tests = result;
-        user.data.code = data.currentExercise.code;
-        user.socket.emit('updatetests', result);
+        user.data.files = data.currentExercise.files;
       }
-    });
+      data.updateAdmin('userlist');
+    }
   },
   getCurrentUser: function(socketID) {
     var index = getUserIndex(socketID);

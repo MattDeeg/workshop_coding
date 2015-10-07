@@ -34,7 +34,10 @@ module.exports = function(socket, existing) {
   }
 
   function runTests() {
-    tester(userData.data.code, shared.currentExercise.tests, function(result, failed) {
+    if (!shared.currentExercise.tests) {
+      return;
+    }
+    tester(userData.data.files[0].code, shared.currentExercise.tests, function(result, failed) {
       userData.data.tests = result;
       socket.emit('updatetests', result);
       if (!failed) {

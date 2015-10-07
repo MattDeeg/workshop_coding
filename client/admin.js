@@ -18,12 +18,6 @@ function init() {
       theme: 'monokai'
     });
 
-    // tests = CodeMirror.fromTextArea(document.getElementById('result_panel'), {
-    //   readOnly: true,
-    //   mode: 'javascript',
-    //   theme: 'monokai'
-    // });
-
     preview = CodeMirror.fromTextArea(document.getElementById('preview_panel'), {
       readOnly: true,
       mode: 'javascript',
@@ -58,6 +52,10 @@ document.delegate('click', '.js-file-tab', function(e) {
 
   document.findAll('.js-file-tab').removeClass('active');
   e.target.addClass('active');
+});
+
+document.delegate('click', '.js-refresh', function(e) {
+  document.find('iframe').contentWindow.location.reload();
 });
 
 document.delegate('click', '.js-change-exercise', function() {
@@ -95,6 +93,7 @@ document.delegate('submit', '.js-exercise-selector-form', function(e) {
     }
   }
   if (selected) {
+    files = activeFile = null
     socket.emit('changeExercise', selected);
     e.target.closest('js-exercise-selector').toggleClass('hidden');
   }
@@ -118,6 +117,26 @@ function updateUserList(data) {
   var userList = document.find('.js-user-list');
   userList.empty();
   userList.append(templates('admin_user_list', data, true));
+}
+
+function setResultsPanel(user, data) {
+  var wrapper = document.find('.result_panel');
+  wrapper.empty();
+  wrapper.append(templates('admin_results_panel', {
+    userId: user.id,
+    barHtml: user.data.tests && user.data.tests.barHtml,
+    testOutput: user.data.tests && user.data.tests.output,
+    tests: data.currentExercise.tests
+  }, true));
+
+  var testResults = document.getElementById('result_panel');
+  if (data.currentExercise.tests && testResults) {
+    tests = CodeMirror.fromTextArea(testResults, {
+      readOnly: true,
+      mode: 'javascript',
+      theme: 'monokai'
+    });
+  }
 }
 
 function updateCodeEditor(data) {
@@ -147,11 +166,7 @@ function updateCodeEditor(data) {
         }
       }, true));
       setEditorToFile(activeFile);
-      if (tests && user.data.tests) {
-        tests.setValue(data.currentExercise.tests);
-        document.find('.results').innerHTML = user.data.tests.output;
-        document.find('.test_progress').innerHTML = user.data.tests.barHtml;
-      }
+      setResultsPanel(user, data);
       break;
     }
   }
