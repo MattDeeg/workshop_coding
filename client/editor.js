@@ -1,22 +1,32 @@
 var files = window.files;
+var activeFile = files[0];
 var lintEditor = true;
 var socket = io();
 socket.on('navigate', init);
 var editor, tests;
 socket.on('load', function(data) {
-  if (data && data.code) {
-    if (editor && tests) {
-      editor.setValue(data.code);
-      tests.setValue(data.tests);
-    }
+  if (data && data.files) {
+    var editorWrapper = document.getElementById('editor_wrapper');
+    var newContent = templates('editor', {exercise: data});
+    files = data.files;
+    activeFile = files[0];
+    editorWrapper.before(newContent.content);
+    editorWrapper.remove();
+    editor = tests = null;
+    init();
   }
 });
+
+function updateServer() {
+  activeFile.code = editor.getValue();
+  socket.emit('updateCode', files, editor.getCursor());
+}
 
 document.on('keydown', function(e) {
   // Disable save key command to avoid natural instincts
   if (e.which === 83 && (e.ctrlKey || e.metaKey) || event.which == 19) {
     e.preventDefault();
-    socket.emit('updateCode', editor.getValue(), editor.getCursor());
+    updateServer();
   }
 });
 
@@ -31,20 +41,18 @@ document.delegate('click', '.js-file-tab', function(e) {
     return;
   }
   var newFile = e.target.getAttribute('data-file-id');
-  var currentContent = editor.getValue();
-  var newFileData;
+  activeFile.code = editor.getValue();
+  activeFile.active = false;
+  var isMustache = false;
   for (var i = 0; i < files.length; i++) {
     if (files[i].name === newFile) {
-      newFileData = files[i];
+      activeFile = files[i];
       files[i].active = true;
-    } else if (files[i].active) {
-      files[i].active = false;
-      files[i].code = currentContent;
+      editor.setValue(files[i].code);
+      isMustache = /\.mustache$/.test(files[i].name);
     }
   }
 
-  editor.setValue(newFileData.code);
-  var isMustache = /\.mustache$/.test(newFileData.name);
   lintEditor = !isMustache;
   editor.setOption('mode', isMustache ? 'mustache' : 'javascript');
   document.findAll('.js-file-tab').removeClass('active');
@@ -66,7 +74,7 @@ function init() {
     return;
   }
   if (editor && tests) {
-    socket.emit('updateCode', editor.getValue(), editor.getCursor());
+    updateServer();
     return;
   }
   if (codePanel) {
@@ -84,9 +92,9 @@ function init() {
     editor.on('change', function() {
       clearTimeout(waiting);
       waiting = setTimeout(updateHints, 500);
-      socket.emit('updateCode', editor.getValue(), editor.getCursor());
+      updateServer();
     });
-    socket.emit('updateCode', editor.getValue(), editor.getCursor());
+    updateServer();
 
     setTimeout(updateHints, 100);
   }

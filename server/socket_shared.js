@@ -29,29 +29,32 @@ function getFileObject(name, fn, active) {
   };
 }
 
-function loadExercise(name) {
-  var exercisePath = path.resolve(data.exercisePath + '/' + name + '.js');
+function loadExercise(name, rootPath) {
+  var exercisePath = path.resolve(rootPath + '/' + name + '.js');
   if (fs.existsSync(exercisePath)) {
     var workshop = require(exercisePath);
+    var data = {};
+    var files;
     if (typeof workshop.initial === 'function') {
-      var files = [getFileObject('', workshop.initial, true)];
-      return {
-        hasFiles: false,
-        files: files,
-        tests: getFunctionContents(workshop.tests),
-        code: files[0].code
-      };
+      files = [getFileObject('entry.js', workshop.initial, true)];
     } else {
-      var files = _.map(workshop.initial, function(fn, filename) {
+      files = _.map(workshop.initial, function(fn, filename) {
         return getFileObject(filename, fn, filename === 'entry.js');
       });
-      return {
-        hasFiles: true,
-        files: files,
-        jsFiles: JSON.stringify(files),
-        code: files[0].code
-      };
     }
+    data.files = files;
+    data.hasFiles = files.length > 1;
+    data.code = files[0].code;
+    if (data.hasFiles) {
+      data.jsFiles = JSON.stringify(files);
+    }
+    if (workshop.tests) {
+      data.tests = getFunctionContents(workshop.tests);
+    }
+    if (workshop.output) {
+      data.output = workshop.output;
+    }
+    return data;
   } else {
     return {};
   }
@@ -91,7 +94,7 @@ var data = module.exports = {
     });
   },
   changeExercise: function(name) {
-    data.currentExercise = loadExercise(name);
+    data.currentExercise = loadExercise(name, data.exercisePath);
     // Get default test results
     tester(data.currentExercise.code, data.currentExercise.tests, function(result) {
       for (var i = data.users.length; i--;) {
@@ -99,7 +102,7 @@ var data = module.exports = {
         user.socket.emit('load', data.currentExercise);
         user.data.tests = result;
         user.data.code = data.currentExercise.code;
-        socket.emit('updatetests', result);
+        user.socket.emit('updatetests', result);
       }
     });
   },

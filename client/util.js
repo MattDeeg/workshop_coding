@@ -130,6 +130,12 @@ Element.prototype.prepend = function(el) {
   }
   this.insertBefore(el, this.firstChild);
 };
+Element.prototype.before = function(el) {
+  if (typeof el === 'string') {
+    el = stringToFragment(el);
+  }
+  this.parentNode.insertBefore(el, this);
+};
 Element.prototype.show = function() {
   this.style.display = '';
 };

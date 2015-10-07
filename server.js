@@ -89,7 +89,7 @@ fs.readdir(config.exercisePath, function (err, files) {
   }
   for (var i = 0; i < files.length; i++) {
     var name = files[i].replace(/\.js$/, '');
-    var data = shared.loadExercise(name);
+    var data = shared.loadExercise(name, config.exercisePath);
     data.name = name;
     exercises.push(data);
     exerciseMap[name] = data;
@@ -261,18 +261,16 @@ app.get('/workshop-output.html', function(req, res) {
   data.files.forEach(function(file) {
     fileMap[file.name] = file.code;
   });
-  // compiler(fileMap, 'entry.js', userId, function(err, output) {
-  //   var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
-  //   if (err) {
-  //     htmlStr += err;
-  //   } else {
-  //     htmlStr += data.output + '<script>' + output + '</script>';
-  //   }
-  //   res.writeHead(200);
-  //   res.end(htmlStr);
-  // });
+  compiler(fileMap, 'entry.js', userId, function(err, output) {
+    var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
+    if (err) {
+      htmlStr += err;
+    } else {
+      htmlStr += data.output + '<script>' + output + '</script>';
+    }
     res.writeHead(200);
-    res.end('<!DOCTYPE html><html lang="en"><body>OUTPUT GOES HERE?');
+    res.end(htmlStr);
+  });
 });
 
 ////////////////////////////////////////////////////////////////////////////////
