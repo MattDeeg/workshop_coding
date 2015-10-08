@@ -3,3 +3,24 @@ html, body {
   background: #272822;
   color: #FFF;
 }
+
+button,
+input[type=button],
+input[type=submit] {
+  border: none;
+  background-color: #5F6158;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1em;
+  cursor: pointer;
+}
+button:active,
+input[type=button]:active,
+input[type=submit]:active {
+  background-color: #4D4F49;
+}
+button:focus,
+input[type=button]:focus,
+input[type=submit]:focus {
+  outline: none;
+}

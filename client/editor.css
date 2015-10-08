@@ -63,6 +63,9 @@ html, body {
   font-size: 1.3em;
   transition: height 500ms;
 }
+.refresh_btn {
+  width: 100%;
+}
 .result_panel {
   top: calc(100vh - 2em);
   left: 0;
