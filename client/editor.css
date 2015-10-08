@@ -98,6 +98,9 @@ html, body {
   list-style: none;
   border-top: 1px solid #66675E;
   border-bottom: 1px solid #66675E;
+  width: calc(100% - 52px);
+  float: left;
+  overflow: hidden;
 }
 .file_tabs:after {
   content: " ";
@@ -111,6 +114,12 @@ html, body {
   color: #C9CAC0;
   font-style: italic;
   cursor: pointer;
+  height: 2rem;
+  line-height: 1.8rem;
+  box-sizing: border-box;
+}
+.file_tabs_inner {
+  width: 10000em;
 }
 .file_tabs .active {
   color: #FFF;
@@ -119,4 +128,11 @@ html, body {
 }
 .file_tabs li + li {
   border-left: 1px solid #66675E;
+}
+.file_nav {
+  float: left;
+  height: calc(2rem + 2px);
+}
+.file_nav + .file_nav {
+  margin-left: 2px;
 }
