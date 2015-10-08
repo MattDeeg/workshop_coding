@@ -96,25 +96,17 @@ var data = module.exports = {
   changeExercise: function(name) {
     data.currentExercise = loadExercise(name, data.exercisePath);
     // Get default test results
-    if (data.currentExercise.tests) {
-      tester(data.currentExercise.code, data.currentExercise.tests, function(result) {
-        for (var i = data.users.length; i--;) {
-          var user = data.users[i];
-          user.socket.emit('load', data.currentExercise);
-          user.data.tests = result;
-          user.data.files = data.currentExercise.files;
-          user.socket.emit('updatetests', result);
-        }
-      });
-    } else {
+    tester(data.currentExercise.code, data.currentExercise.tests, function(result) {
       for (var i = data.users.length; i--;) {
         var user = data.users[i];
-        user.data.tests = null;
         user.socket.emit('load', data.currentExercise);
+        user.data.tests = result;
         user.data.files = data.currentExercise.files;
+        if (result) {
+          user.socket.emit('updatetests', result);
+        }
       }
-      data.updateAdmin('userlist');
-    }
+    });
   },
   getCurrentUser: function(userId) {
     var index = getUserIndex(userId);

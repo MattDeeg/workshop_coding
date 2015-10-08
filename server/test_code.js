@@ -3,6 +3,10 @@ var Jasmine = require('jasmine');
 var WorkshopReporter = require('./workshop_reporter');
 
 module.exports = function(code, tests, callback) {
+  if (!tests) {
+    callback(null);
+    return;
+  }
   var reporter = new WorkshopReporter();
 
   var jasmine = new Jasmine();
