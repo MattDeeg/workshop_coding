@@ -9,8 +9,27 @@ module.exports = function(config) {
     config.rootOutputFolder = path.join(__dirname, config.rootOutputFolder);
   }
 
-  return function(files, entryModule, folderName, callback) {
-    var outputFolder = path.join(config.rootOutputFolder + folderName);
+  function getOutputFolder(folderName) {
+    return path.join(config.rootOutputFolder + folderName);
+  }
+
+  function readOutput(outputFile) {
+    if (fs.existsSync(outputFile)) {
+      return fs.readFileSync(outputFile).toString();
+    }
+  }
+
+  var getLastOutput = function(folderName) {
+    var outputFile = getOutputFolder(folderName) + '/output.js';
+    var output = readOutput(outputFile);
+    if (!output) {
+      output = 'Unknown error compiling, file not output'
+    }
+    return output;
+  }
+
+  var build = function(files, entryModule, folderName, callback) {
+    var outputFolder = getOutputFolder(folderName);
     // Clear previous data
     rmdir(outputFolder, function() {
       mkdirp.sync(outputFolder);
@@ -51,8 +70,18 @@ module.exports = function(config) {
       }
 
       webpack(buildConfig, function(err, stats) {
-        callback(getErrorString(err, stats), fs.readFileSync(outputFile).toString());
+        var errStr = getErrorString(err, stats);
+        var output = readOutput(outputFile);
+        if (!output) {
+          errStr = errStr || 'Unknown error compiling, file not output';
+        }
+        callback(errStr, output);
       });
     });
   };
+
+  return {
+    build: build,
+    getLastOutput: getLastOutput
+  }
 };

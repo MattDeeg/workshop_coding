@@ -7,16 +7,13 @@ module.exports = function(socket, existing) {
   socket.emit('init_user');
 
   var userData;
-  if (existing.id) {
-    var index = getUserIndex(existing.id);
-    if (index !== null) {
-      userData = shared.users[index];
-      userData.socket = socket;
-      userData.inactive = false;
-    }
-  }
-
-  if (!userData) {
+  var index = getUserIndex(existing.id);
+  if (index !== null) {
+    userData = shared.users[index];
+    userData.name = existing.name;
+    userData.socket = socket;
+    userData.inactive = false;
+  } else {
     userData = {
       id: existing.id,
       name: existing.name,
@@ -24,9 +21,7 @@ module.exports = function(socket, existing) {
       inactive: false,
       data: {
         hasFiles: shared.currentExercise.hasFiles,
-        files: shared.currentExercise.files,
-        code: shared.currentExercise.code,
-        cursor: null
+        files: shared.currentExercise.files
       }
     };
     shared.users.push(userData);
@@ -41,7 +36,7 @@ module.exports = function(socket, existing) {
       socket.emit('updatetests', result);
       if (!failed) {
         shared.updateAdmin('userlist');
-        shared.updateAdmin('code', {forId: socket.id});
+        shared.updateAdmin('updateresults', {forId: userData.id});
       }
     });
   }
@@ -56,26 +51,24 @@ module.exports = function(socket, existing) {
 
   socket.on('login', function(name) {
     userData.name = name;
+    var exercise = shared.getCurrentData(userData.id);
     shared.navigate(socket, 'editor', {
       username: name,
-      exercise: shared.getCurrentData(socket.id)
+      exercise: exercise,
+      activeFile: _.findWhere(exercise.files, {fileClass:'active'})
     });
     shared.updateAdmin('userlist');
   });
 
   socket.on('updateCode', function(files) {
-    var index = getUserIndex(socket.id);
-    if (index !== null) {
-      var userData = shared.users[index];
-      userData.data.files = files;
-      shared.updateAdmin('code', {forId: socket.id});
-      userData.runTests();
-    }
+    userData.data.files = files;
+    shared.updateAdmin('code', {forId: userData.id});
+    userData.runTests();
   });
 
   socket.on('logout', function() {
     shared.navigate(socket, 'login');
-    var index = getUserIndex(socket.id);
+    var index = getUserIndex(userData.id);
     if (index !== null) {
       shared.users.splice(index, 1);
       shared.updateAdmin('userlist');
@@ -83,10 +76,7 @@ module.exports = function(socket, existing) {
   });
 
   socket.on('disconnect', function() {
-    var index = getUserIndex(socket.id);
-    if (index !== null) {
-      shared.users[index].inactive = true;
-      shared.updateAdmin('userlist');
-    }
+    userData.inactive = true;
+    shared.updateAdmin('userlist');
   });
 };

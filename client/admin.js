@@ -105,7 +105,7 @@ document.delegate('click', '.js-user', function(e) {
   selectedUserId = userRow.getAttribute('data-id');
   if (lastUserData) {
     updateUserList(lastUserData);
-    updateCodeEditor(lastUserData);
+    updateCodeEditor(lastUserData, true);
   }
 });
 
@@ -138,7 +138,7 @@ function setResultsPanel(user, data) {
   }
 }
 
-function updateCodeEditor(data) {
+function updateCodeEditor(data, refreshResults) {
   for (var i = data.users.length; i--;) {
     if (data.users[i].id === selectedUserId) {
       var user = data.users[i];
@@ -165,7 +165,9 @@ function updateCodeEditor(data) {
         }
       }, true));
       setEditorToFile(activeFile);
-      setResultsPanel(user, data);
+      if (refreshResults) {
+        setResultsPanel(user, data);
+      }
       break;
     }
   }
@@ -178,6 +180,13 @@ socket.on('refreshdata', function(data) {
 socket.on('userlist', function(data) {
   lastUserData = data;
   updateUserList(data);
+});
+
+socket.on('updateresults', function(data) {
+  if (data.forId !== selectedUserId) {
+    return;
+  }
+  updateCodeEditor(lastUserData, true);
 });
 
 socket.on('code', function(data) {

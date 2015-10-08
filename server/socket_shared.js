@@ -90,7 +90,7 @@ var data = module.exports = {
   navigate: function navigate(socket, template, data) {
     socket.emit('navigate', {
       template:template,
-      data:data||{}
+      data:data || {}
     });
   },
   changeExercise: function(name) {

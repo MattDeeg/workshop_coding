@@ -2,13 +2,13 @@ var socket = io();
 window.on('load', function() {
   socket.emit('handshake');
   socket.on('identify', function() {
-    var matches = /(^| )workshop_id="(.*?)"/.exec(document.cookie);
+    var matches = /(^| )workshop_id=(.*?)(;|$)/.exec(document.cookie);
     var existing = {};
     if (matches && matches[2]) {
       existing.id = matches[2];
     }
 
-    matches = /(^| )name="(.*?)"/.exec(document.cookie);
+    matches = /(^| )name=(.*?)(;|$)/.exec(document.cookie);
     if (matches && matches[2]) {
       existing.name = matches[2];
     }
@@ -19,7 +19,8 @@ window.on('load', function() {
 
 document.delegate('click', '.logout', function(e) {
   e.preventDefault();
-  document.cookie='name=';
+  document.cookie = 'name=';
+  document.cookie = 'workshop_id=';
   socket.emit('logout');
 });
 

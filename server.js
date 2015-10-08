@@ -69,11 +69,29 @@ function render(req, res, template, data) {
   }
 }
 
+function getHexStr(l) {
+  l = Math.max(0, l);
+  var o = '';
+  for (var i = l; i--;) {
+    o += Math.floor(Math.random() * 16 + 1).toString(16);
+  }
+  return o;
+}
+
+function getGuid() {
+  return getHexStr(36);
+}
+
 app.get('/', function(req, res){
+  var workshopId = req.cookies.workshop_id;
+  if (!workshopId) {
+    workshopId = getGuid();
+    res.cookie('workshop_id', workshopId);
+  }
   if (!req.cookies.name) {
     render(req, res, 'login', {});
   } else {
-    var exercise = shared.getCurrentData(req.cookies.workshop_id);
+    var exercise = shared.getCurrentData(workshopId);
     var activeFile = _.findWhere(exercise.files, {fileClass: 'active'});
     render(req, res, 'editor', {
       username: req.cookies.name,
@@ -123,7 +141,7 @@ io.on('connection', function(socket) {
       }
     });
 
-    socket.emit('identify', socket.id);
+    socket.emit('identify');
   });
 });
 
@@ -259,31 +277,36 @@ var compiler = getCompiler({
 });
 
 function getWorkshopOutput(res, userId) {
+}
+
+app.get('/admin-workshop-output.html', function(req, res) {
+  var userId = req.query.user_id;
+  var data = shared.getCurrentData(userId);
+  var output = compiler.getLastOutput(userId);
+  var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
+  htmlStr += data.output + '<script>' + output + '</script>';
+  res.writeHead(200);
+  res.end(htmlStr);
+});
+
+app.get('/workshop-output.html', function(req, res) {
+  var userId = req.cookies.workshop_id;
   var data = shared.getCurrentData(userId);
   var fileMap = {};
   data.files.forEach(function(file) {
     fileMap[file.name] = file.code;
   });
-  compiler(fileMap, 'entry.js', userId, function(err, output) {
+  compiler.build(fileMap, 'entry.js', userId, function(err, output) {
     var htmlStr = '<!DOCTYPE html><html lang="en"><body>';
     if (err) {
       htmlStr += err;
     } else {
       htmlStr += data.output + '<script>' + output + '</script>';
     }
+    shared.updateAdmin('updateresults', {forId: userId});
     res.writeHead(200);
     res.end(htmlStr);
   });
-}
-
-app.get('/admin-workshop-output.html', function(req, res) {
-  console.log('admin-building for ', req.query.user_id);
-  getWorkshopOutput(res, req.query.user_id);
-});
-
-app.get('/workshop-output.html', function(req, res) {
-  console.log('building for ', req.cookies.workshop_id);
-  getWorkshopOutput(res, req.cookies.workshop_id);
 });
 
 ////////////////////////////////////////////////////////////////////////////////
