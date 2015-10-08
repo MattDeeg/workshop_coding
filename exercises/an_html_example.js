@@ -10,6 +10,26 @@ module.exports = {
         el.innerHTML = 'LOADED';
       };
     },
+    'view2.js': function() {
+      module.exports = function(el) {
+        el.innerHTML = 'LOADED';
+      };
+    },
+    'view3.js': function() {
+      module.exports = function(el) {
+        el.innerHTML = 'LOADED';
+      };
+    },
+    'view4.js': function() {
+      module.exports = function(el) {
+        el.innerHTML = 'LOADED';
+      };
+    },
+    'view5.js': function() {
+      module.exports = function(el) {
+        el.innerHTML = 'LOADED';
+      };
+    },
     'view.mustache': `<div>
   {{test}}
 </div>`
