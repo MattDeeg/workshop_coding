@@ -17,7 +17,7 @@ socket.on('load', function(data) {
     files = data.files;
     activeFile = files[0];
     app.empty();
-    app.append(templates('editor', {exercise: data}, 'content'));
+    app.append(templates('editor', {exercise: data, activeFile: activeFile}, 'content'));
     editor = tests = null;
     init();
   }
