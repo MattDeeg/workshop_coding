@@ -227,7 +227,8 @@ var adminJS = [
   './client/jshint.config.js',
   './node_modules/jshint/dist/jshint.js',
   function() { return 'var ADMIN_SECRET="' + ADMIN_SECRET + '";'; },
-  './client/admin.js'
+  './client/admin.js',
+  './client/file-nav-navigation.js'
 ];
 app.get('/admin.js', fileConcat(adminJS, 'text/javascript'));
 
@@ -245,7 +246,8 @@ var editorJS = [
   './client/codemirror-mustache.js',
   './client/jshint.config.js',
   './node_modules/jshint/dist/jshint.js',
-  './client/editor.js'
+  './client/editor.js',
+  './client/file-nav-navigation.js'
 ];
 app.get('/editor.js', fileConcat(editorJS, 'text/javascript'));
 

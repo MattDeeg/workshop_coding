@@ -1,13 +1,13 @@
 {{#exercise.hasFiles}}
   <div class="file_tabs_wrapper">
-    <div class="file_tabs">
+    <div class="file_tabs js-file-nav-scrollable">
       <nav class="file_tabs_inner">
         {{#exercise.files}}
           <li class="js-file-tab {{fileClass}}" data-file-id="{{name}}">{{name}}</li>
         {{/exercise.files}}
         </nav>
     </div>
-    <button class="js-file-nav-left file_nav">&lt;</button>
-    <button class="js-file-nav-right file_nav">&gt;</button>
+    <button class="js-file-nav-scroll file_nav" data-scrollby="-20">&lt;</button>
+    <button class="js-file-nav-scroll file_nav" data-scrollby="20">&gt;</button>
   </div>
 {{/exercise.hasFiles}}
